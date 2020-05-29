@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+<body>
+  <meta charset='utf-8' />
+
+  <link rel="stylesheet" type="text/css" href="toaq.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js">
+  </script>
+  <script>
+    var dict = [];
+
+    function normalized(toa) {
+      return toa.normalize('NFD')
+                .replace(/i/g, 'ı')
+                .replace(/[\u0300-\u030f]/g, '')
+                .replace(/[^0-9A-Za-zı'_\-]+/g, ' ')
+                .replace(/ +/g, ' ')
+                .trim()
+                .toLowerCase();
+    }
+
+    function output_tooltip_text(text) {
+      /*** AUTOMATIC WORD DEFINITION TOOLTIPS FOR TOAQ TEXTS ***/
+      // `dict` is the content of the loaded dictionary.json.
+      var hoetoalai = "'’a-zA-Zıāēīōūȳáéíóúýäëïöüÿǎěǐǒǔảẻỉỏủỷâêîôûŷàèìòùỳãẽĩõũỹ"
+                  + "ĀĒĪŌŪȲÁÉÍÓÚÝÄËÏÖÜŸǍĚǏǑǓẢẺỈỎỦỶÂÊÎÔÛŶÀÈÌÒÙỲÃẼĨÕŨỸ"
+                  + "\u0300-\u030f";
+      var re = new RegExp(
+        "<[^>]*>|[" + hoetoalai + "]+|[^<" + hoetoalai + "]", "g");
+      // Loading the Toaq text from the elements of class `with_tooltip_definitions`:
+      /* Splitting the content into an array of things that are either
+         Toaq words or are other stuff (blanks, HTML tags…): */
+      var content = text.match(re);
+      content.forEach(function (item, index, array) {
+        // For each item in `content`, we check whether it's a Toaq word:
+        if ((new RegExp("["+hoetoalai+"]")).test(item[0])) {
+          /* It is a Toaq word, so we get a normalized form of it
+            (removing diacritics and having dotless i's: */
+          var normalized_word = normalized(item);
+          // Now we look up the dictionary for the word:
+          dict.forEach(function (entry, i, arr) {
+            if (normalized(entry.toaq) == normalized_word) {
+              // We have found the word in the dictionary.
+              // Now we create a tooltip containing its definition:
+              array[index] = '<div class="tip">' + item
+                    + '<span class="tiptext">' + normalized_word
+                    + ' : ' + entry.english.replace(/▯/g, "___")
+                    + '</span></div>';
+            }
+            /* If we don't find the word in the dictionary, no tooltip
+               is created. Nothing will happen when hovering the word
+               with the mouse pointer. */
+          });
+        }
+      });
+      return content.join("");
+    }
+    
+    $.getJSON(
+      "https://toaq.github.io/dictionary/dictionary.json",
+      function (json) {
+      dict = JSON.parse(JSON.stringify(json));
+    // Checking for errors on JSON dictionary loading:
+    }).error(function(jqXHR, textStatus, errorThrown) {
+          console.log("getJSON error: " + textStatus);
+          console.log("Incoming Text: " + jqXHR.responseText);
+    });
+  </script>
+
+<span style="font: 15px arial, sans-serif;">Type any Toaq text in the following textarea.</span>
+<br /><br />
+
+<form id="form1" name="form1" method="post" action="" style="width:100%">
+  <textarea id="input_textarea" style="width:100%" rows="8" autofocus></textarea>
+</form>
+<br />
+<div style="border: solid 1px; padding: 10px; background-color: #DDDDFF;"
+     height="24em">
+  <div id="output" width="100%" height="100%"> </div>
+</div>
+
+
+<script>
+/*
+ *  Binding the function run() to keyup event on input_textarea by using jQuery
+ */
+$('#input_textarea').bind("keyup",
+  function(e) {
+    var input = $('#input_textarea').val();
+    /* Retrieve the result */
+    var out = output_tooltip_text(input);
+    $('#output').html(out);
+    });
+</script>
+
+</body>
+</html>
+
