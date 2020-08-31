@@ -29,8 +29,8 @@ else:
     for e in json:
       if (e['scope'] == 'en' and ' ' not in e['head'].strip()
           and e['user'] not in ['examples', 'countries']):
-        is_upvoted = 'vote' in e and e['vote'] > 0
-        isnt_downvoted = not ('vote' in e and e['vote'] < 0)
+        is_upvoted = 'score' in e and e['score'] > 0
+        isnt_downvoted = not ('score' in e and e['score'] < 0)
         if e['user'] == 'spreadsheet' and isnt_downvoted:
           n_spreadsheet_words += 1
         if e['user'] == 'official':
