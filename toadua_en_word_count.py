@@ -25,20 +25,23 @@ else:
     upvoted_words = set()
     n_official_words = 0
     n_spreadsheet_words = 0
-    for e in json['results']:
+    #for e in json['results']:
+    for e in json:
       if (e['scope'] == 'en' and ' ' not in e['head'].strip()
           and e['user'] not in ['examples', 'countries']):
-        if e['user'] == 'spreadsheet' and e['vote'] >= 0:
+        is_upvoted = 'vote' in e and e['vote'] > 0
+        isnt_downvoted = not ('vote' in e and e['vote'] < 0)
+        if e['user'] == 'spreadsheet' and isnt_downvoted:
           n_spreadsheet_words += 1
         if e['user'] == 'official':
           n_official_words += 1
           words.add(normalize(e['head']))
           upvoted_words.add(normalize(e['head']))
           defs.add(e['body'].strip(" .") + u'.')
-        elif e['vote'] >= 0:
+        elif isnt_downvoted:
           words.add(normalize(e['head']))
           defs.add(e['body'].strip(" .") + u'.')
-          if e['vote'] >= 1:
+          if is_upvoted:
             upvoted_words.add(normalize(e['head']))
     print(u"Number of unique words:           " + str(len(words)))
     print(u"Number of unique definitions:     " + str(len(defs)))
