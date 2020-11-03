@@ -389,6 +389,11 @@ li ol > li:before {
       font-weight: bold;
   }
 
+  .tip-unofficial .tiptext-unofficial {
+      background-color: #744;
+      color: #f2cf8c;
+  }
+
   .tip .tiptext::after {
       position: absolute;
       top: 100%;

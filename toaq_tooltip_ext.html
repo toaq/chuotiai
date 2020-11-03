@@ -66,9 +66,12 @@
                 def = get_english(entry.translations);
                 if (def != "") {
                   // Now we create a tooltip containing its definition:
-                  array[index] = '<div class="tip">' + item
-                    + '<span class="tiptext">' + normalized_word
-                    + ' : ' + def + '</span></div>';
+                  tip = entry.official ? "tip" : "tip-unofficial tip";
+                  tiptext = entry.official ?
+                    "tiptext" : "tiptext-unofficial tiptext";
+                  array[index] = '<div class="' + tip + '">'
+                     + item + '<span class="' + tiptext + '">'
+                     + normalized_word + ' : ' + def + '</span></div>';
                 }
               }
             });
