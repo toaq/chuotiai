@@ -112,9 +112,10 @@
 /*
  *  Binding the function run() to keyup event on input_textarea by using jQuery
  */
-$('#input_textarea').bind("keyup",
+$('#input_textarea').on("keyup paste",
   function(e) {
     var input = $('#input_textarea').val();
+    input = input.replace(/\n/g, "<br />");
     /* Retrieve the result */
     var out = output_tooltip_text(input);
     $('#output').html(out);
