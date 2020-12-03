@@ -66,7 +66,7 @@ interjections = {
 # ==================================================================== #
 
 def is_a_word(s):
-  pass
+  raise NotImplementedError()
 
 def with_carons_replaced_with_diareses(s):
   return _with_replaced_characters(s, "ǎěǐǒǔ", "äëïöü")
