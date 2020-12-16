@@ -172,7 +172,7 @@ def is_a_contentive_lemma(s):
 def is_a_lemma(s):
   return (
     is_a_contentive_lemma(s) or s in (
-      toneless_particles + particles_with_lexical_tone + interjections))
+      toneless_particles | particles_with_lexical_tone | interjections))
 
 def __is_an_interjection(s):
   return None != re.match(
