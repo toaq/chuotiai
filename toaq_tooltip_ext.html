@@ -10,6 +10,35 @@
   <script>
     var dict = [];
 
+    function is_string(v) {
+      return Object.prototype.toString.call(v) === '[object String]';
+    }
+    
+    function is_array(v) {
+      return Object.prototype.toString.call(v) === '[object Array]';
+    }
+    
+    function is_undefined(v) {
+      return Object.prototype.toString.call(v) === '[object Undefined]';
+    }
+    
+    function with_escaped_html(text) {
+      return text.replace(/[&<>"']/g, function(ch) {
+        switch (ch) {
+          case '&':
+            return '&amp;';
+          case '<':
+            return '&lt;';
+          case '>':
+            return '&gt;';
+          case '"':
+            return '&quot;';
+          default:
+            return '&#039;';
+        }
+      });
+    };
+    
     function normalized(toa) {
       return toa.normalize('NFD')
                 .replace(/i/g, 'ı')
@@ -19,62 +48,70 @@
                 .trim()
                 .toLowerCase();
     }
-
-    function get_english(translations) {
-      def = ""
-      translations.forEach(function (item, i, a) {
-        if (item.language === "eng") {
-          def = item.definition;
+    
+    function get_definition(entry, language) {
+      if (language == "eng" && !is_undefined(entry.english)) {
+        return entry.english;
+      } else if (!is_undefined(entry.translations)) {
+        for (const item of entry.translations) {
+          if (item.language === language)
+            return item.definition;
         }
-      });
-      return def;
+      } else return ""; // Definition not found.
     }
     
-    function is_array(v) {
-      return Object.prototype.toString.call(v) === '[object Array]';
-    }
-    
-    function output_tooltip_text(text) {
+    function tooltip_html_from_toaq_text(dictionary, text) {
       /*** AUTOMATIC WORD DEFINITION TOOLTIPS FOR TOAQ TEXTS ***/
-      // `dict` is the content of the loaded dictionary.json.
+      // `dictionary` is the content of the loaded dictionary.json.
       var hoetoalai = "'’a-zA-Zıāēīōūȳáéíóúýäëïöüÿǎěǐǒǔảẻỉỏủỷâêîôûŷàèìòùỳãẽĩõũỹ"
                   + "ĀĒĪŌŪȲÁÉÍÓÚÝÄËÏÖÜŸǍĚǏǑǓẢẺỈỎỦỶÂÊÎÔÛŶÀÈÌÒÙỲÃẼĨÕŨỸ"
                   + "\u0300-\u030f";
-      var re = new RegExp(
-        "<[^>]*>|[" + hoetoalai + "]+|[^<" + hoetoalai + "]", "g");
+      if (is_undefined(tooltip_html_from_toaq_text.content_re)) {
+        tooltip_html_from_toaq_text.content_re = new RegExp(
+          "<[^>]*>|[" + hoetoalai + "]+|[^<" + hoetoalai + "]", "g");
+        tooltip_html_from_toaq_text.toaq_re = new RegExp(
+          "[" + hoetoalai + "].*")
+        /* ^ This way, the regexp objects will be generated only
+          once and not upon each call of the function. */
+      }
       // Loading the Toaq text from the elements of class `with_tooltip_definitions`:
       /* Splitting the content into an array of things that are either
          Toaq words or are other stuff (blanks, HTML tags…): */
-      var content = text.match(re);
+      var content = text.match(tooltip_html_from_toaq_text.content_re);
       if (content === null)
         return;
       content.forEach(function (item, index, array) {
         // For each item in `content`, we check whether it's a Toaq word:
-        if ((new RegExp("["+hoetoalai+"]")).test(item[0])) {
+        if (tooltip_html_from_toaq_text.toaq_re.test(item)) {
           /* It is a Toaq word, so we get a normalized form of it
             (removing diacritics and having dotless i's: */
           var normalized_word = normalized(item);
           // Now we look up the dictionary for the word:
-          dict.forEach(function (entry, i, arr) {
-            if (!is_array(entry.toaq)) {
-              console.log("TYPE ERROR FOR entry.toaq: " + Object.prototype.toString.call(entry.toaq));
-            }
-            entry.toaq.forEach(function (toaq, j, arr2) {
+          dictionary.forEach(function (entry, i, arr) {
+            function f(toaq) {
               if (normalized(toaq) == normalized_word) {
                 // We have found the word in the dictionary.
                 // Now we fetch its definition and check if it isn't empty.
-                def = get_english(entry.translations);
+                var def = get_definition(entry, "eng");
                 if (def != "") {
+                  def = with_escaped_html(def);
                   // Now we create a tooltip containing its definition:
-                  tip = entry.official ? "tip" : "tip-unofficial tip";
-                  tiptext = entry.official ?
+                  var tip = entry.official ? "tip" : "tip-unofficial tip";
+                  var tiptext = entry.official ?
                     "tiptext" : "tiptext-unofficial tiptext";
                   array[index] = '<div class="' + tip + '">'
                      + item + '<span class="' + tiptext + '">'
                      + normalized_word + ' : ' + def + '</span></div>';
                 }
               }
-            });
+            }
+            if (is_string(entry.toaq)) {
+              f(entry.toaq);
+            } else if (is_array(entry.toaq)) {
+              entry.toaq.forEach(f);
+            } else {
+              console.log("TYPE ERROR FOR `entry.toaq`: " + Object.prototype.toString.call(entry.toaq));
+            }
             /* If we don't find the word in the dictionary, no tooltip
                is created. Nothing will happen when hovering the word
                with the mouse pointer. */
@@ -117,8 +154,7 @@ $('#input_textarea').on("keyup paste",
     var input = $('#input_textarea').val();
     input = input.replace(/\n/g, "<br />");
     /* Retrieve the result */
-    var out = output_tooltip_text(input);
-    $('#output').html(out);
+    $('#output').html(tooltip_html_from_toaq_text(dict, input));
     });
 </script>
 
