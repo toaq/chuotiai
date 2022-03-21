@@ -54,12 +54,14 @@
     function get_definition(entry, language) {
       if (language == "eng" && !is_undefined(entry.english)) {
         return entry.english;
-      } else if (!is_undefined(entry.translations)) {
+      }
+      if (!is_undefined(entry.translations)) {
         for (const item of entry.translations) {
           if (item.language === language)
             return item.definition;
         }
-      } else return ""; // Definition not found.
+      }
+      return ""; // Definition not found.
     }
     
     function tooltip_html_from_toaq_text(dictionary, text) {
@@ -95,7 +97,7 @@
                 // We have found the word in the dictionary.
                 // Now we fetch its definition and check if it isn't empty.
                 var def = get_definition(entry, "eng");
-                if (def != "") {
+                if (def) {
                   def = with_escaped_html(def);
                   // Now we create a tooltip containing its definition:
                   var tip = entry.official ? "tip" : "tip-unofficial tip";
