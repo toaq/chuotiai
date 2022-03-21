@@ -4,7 +4,7 @@
 
 # ==================================================================== #
 
-import re, unicodedata
+import regex as re, unicodedata
 
 # ==================================================================== #
 
@@ -108,11 +108,8 @@ def normalized(s):
     "[\sáéíóúýäëïöüÿảẻỉỏủỷâêîôûŷàèìòùỳãẽĩõũỹ]", s, re.IGNORECASE
   ):
     # The input is a lemma.
-    s = s.lower()
+    s = s[0] + s[1:].lower()
     s = _with_replaced_characters(s, "āēīōūȳ", "aeıouy")
-    p = ("([aeiıouyāēīōūȳ][aeiıouy]*q?['bcdfghjklmnprstz]h?[aeiouy])"
-         + "(?![\u0300-\u030f])")
-    s = re.sub(p, "\\1\u0304", s)
     s = unicodedata.normalize("NFC", s)
   else:
     # The input is a normal Toaq text or fragment (not a lemma form).
@@ -144,29 +141,28 @@ def normalized(s):
       l[i] = f(l[i])
       i += 2
     s = "".join(l)
-    # ⌵ Restoring missing macrons:
-    s = with_macrons(s)
   return s
 
 def with_macrons(s):
+  # ((?<=[aeıouyāēīōūȳáéíóúýäëïöüÿảẻỉỏủỷâêîôûŷàèìòùỳãẽĩõũỹ])[aeiıouy]*q?['bcdfghjklmnprstz]h?[aeiouy])(?![\u0300-\u030f])"
   p = ("([" + std_vowel_str
          + "][aeiıouy]*q?['bcdfghjklmnprstz]h?[aeiouy])"
          + "(?![\u0300-\u030f])")
-  s = re.sub(p , "\\1\u0304", s)
+  s = re.sub(p, "\\1\u0304", s, overlapped=True)
   s = unicodedata.normalize("NFC", s)
   return s
 
 def is_an_inflected_contentive(s):
   return None != re.match(
     ( "([bcdfghjklmnprstz]h?)?"
-    + "[aeiıouyāēīōūȳáéíóúýäëïöüÿǎěǐǒǔảẻỉỏủỷâêîôûŷàèìòùỳãẽĩõũỹ]"
-    + "[aeıouy]*q?((['bcdfghjklmnprstz]h?)[āēīōūȳ][aeıouy]*q?)*$" ),
+    + "[aeiıouyáéíóúýäëïöüÿǎěǐǒǔảẻỉỏủỷâêîôûŷàèìòùỳãẽĩõũỹ]"
+    + "[aeıouy]*q?((['bcdfghjklmnprstz]h?)[aeıouy]+q?)*$" ),
     s)
 
 def is_a_contentive_lemma(s):
   return None != re.match(
     ( "([bcdfghjklmnprstz]h?)?[aeıouy]+q?"
-    + "((['bcdfghjklmnprstz]h?)[āēīōūȳ][aeıouy]*q?)*$" ),
+    + "((['bcdfghjklmnprstz]h?)[aeıouy]+q?)*$" ),
     s)
 
 def is_a_lemma(s):
