@@ -8,8 +8,8 @@ import regex as re, unicodedata
 
 # ==================================================================== #
 
-vowel_str = "aeiıouyāēīōūȳáéíóúýäëïöüÿǎěǐǒǔảẻỉỏủỷâêîôûŷàèìòùỳãẽĩõũỹ"
-std_vowel_str = "aeıouyāēīōūȳáéíóúýäëïöüÿảẻỉỏủỷâêîôûŷàèìòùỳãẽĩõũỹ"
+vowel_str = "aeiıouyáéíóúýäëïöüÿǎěǐǒǔảẻỉỏủỷâêîôûŷàèìòùỳãẽĩõũỹ"
+std_vowel_str = "aeıouyáéíóúýäëïöüÿảẻỉỏủỷâêîôûŷàèìòùỳãẽĩõũỹ"
 vowels = vowel_str
 std_vowels = std_vowel_str
 consonant_str = "'bcdfghjȷklmnprstzq"
@@ -19,45 +19,40 @@ std_initial_str = "'bcdfghjklmnprstz"
 charset = vowel_str + consonant_str
 std_charset = std_vowel_str + std_consonant_str
 
-initials = ("'", "b", "c", "ch", "d", "f", "g", "h", "j", "ȷ", "k", "l", "m", "n", "p", "r", "s", "sh", "t", "z")
+initials = ("'", "b", "c", "ch", "d", "f", "g", "h", "j", "ȷ", "k", "l", "m", "n", "nh", "p", "r", "s", "sh", "t", "z")
 consonants = initials + ("q",)
-std_initials = ("'", "b", "c", "ch", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", "r", "s", "sh", "t", "z")
+std_initials = ("'", "b", "c", "ch", "d", "f", "g", "h", "j", "k", "l", "m", "n", "nh", "p", "r", "s", "sh", "t", "z")
 std_consonants = std_initials + ("q",)
-
-# ('', 'a', 'e', 'ı', 'o', 'u', 'y')
-# ('', 'ā', 'ē', 'ī', 'ō', 'ū', 'ȳ')
-
 
 # ==================================================================== #
 
 quantifiers = {"sa", "sıa", "tu", "ja", "ke", "hı", "co", "baq", "hoı"}
 conjunctions = {"ru", "ra", "ro", "rı", "roı"}
-illocutions = {"da", "ba", "ka", "moq"}
-linkers = {"fı", "go", "cu", "ta"}
+illocutions = {"da", "ba", "ka", "moq", "nha"}
 sentence_prefixes = {"je", "keo", "tıu"}
-prefixes = {"ku", "tou", "beı"}
-terminators = {"na", "ga", "ceı"}
+focus_prefixes = {"ku", "tou", "beı"}
+terminators = {"na", "ga", "cy", "ky", "teo", "kı"}
 prenex_markers = {"bı", "pa"}
-freemod_prefixes = {"ju", "la"}
+freemod_prefixes = {"ju"}
 
 toneless_particles = (
   quantifiers | {"to"} | conjunctions | illocutions | linkers
-  | sentence_prefixes | prefixes | terminators | prenex_markers
+  | sentence_prefixes | focus_prefixes | terminators | prenex_markers
   | freemod_prefixes)
-# "sa", "sıa", "tu", "ja", "ke", "hı", "co", "baq", "hoı", "to", "ru", "ra", "ro", "rı", "roı", "da", "ba", "ka", "moq", "fı", "go", "cu", "ta", "je", "keo", "tıu", "ku", "tou", "beı", "bı", "pa", "ju", "la", "kıo", "kı", "teo", "hu", "na", "ga", "ceı"
+# "sa", "sıa", "tu", "ja", "ke", "hı", "co", "baq", "hoı", "to", "ru", "ra", "ro", "rı", "roı", "da", "ba", "ka", "moq", "fı", "go", "cu", "ta", "je", "keo", "tıu", "ku", "tou", "beı", "bı", "pa", "ju", "la", "kıo", "kı", "teo", "hu", "na", "ga", "cy", "ky"
 
 
-particles_with_grammatical_tone = {
-  "po", "jeı", "mea", "mı", "shu", "mo"
+functors_with_grammatical_tone = {
+  "lu", "po", "jeı", "mea", "mı", "shu", "mo"
 }
 
-particles_with_lexical_tone = {
-  "mả", "mâ", "tỉo", "tîo", "lủ", "lú", "lü", "lũ", "lî"
+functors_with_lexical_tone = {
+  "mả", "mâ", "tỉo", "tîo", "lả", "lâ", "lá", "lä", "lã", "lî"
 }
 
-particle_lemmas = (
-  toneless_particles | particles_with_grammatical_tone
-  | particles_with_lexical_tone)
+functor_lemmas = (
+  toneless_particles | functors_with_grammatical_tone
+  | functors_with_lexical_tone)
 
 interjections = {
   'm̄', 'ḿ', 'm̈', 'm̉', 'm̂', 'm̀', 'm̃'
@@ -92,8 +87,7 @@ def diacriticless_normalized(s):
   return s.strip()
   
 def lemma_of(s):
-  s = diacriticless_normalized(s)
-  return with_macrons(s)
+  return diacriticless_normalized(s)
 
 def normalized(s):
   # Normalizing nonstandard characters:
@@ -109,7 +103,6 @@ def normalized(s):
   ):
     # The input is a lemma.
     s = s[0] + s[1:].lower()
-    s = _with_replaced_characters(s, "āēīōūȳ", "aeıouy")
     s = unicodedata.normalize("NFC", s)
   else:
     # The input is a normal Toaq text or fragment (not a lemma form).
@@ -124,11 +117,11 @@ def normalized(s):
         main_vowel_pos = w.index(r[0])
         bare = _with_replaced_characters(
           w,
-          "āēīōūȳáéíóúýäëïöüÿảẻỉỏủỷâêîôûŷàèìòùỳãẽĩõũỹ",
-          "aeıouyaeıouyaeıouyaeıouyaeıouyaeıouyaeıouy")
+          "áéíóúýäëïöüÿảẻỉỏủỷâêîôûŷàèìòùỳãẽĩõũỹ",
+          "aeıouyaeıouyaeıouyaeıouyaeıouyaeıouy")
         if bare in toneless_particles:
           return bare
-        elif bare in particles_with_grammatical_tone:
+        elif bare in functors_with_grammatical_tone:
           pass
         v = w[main_vowel_pos]
         if v in "aeıouy":
@@ -141,15 +134,6 @@ def normalized(s):
       l[i] = f(l[i])
       i += 2
     s = "".join(l)
-  return s
-
-def with_macrons(s):
-  # ((?<=[aeıouyāēīōūȳáéíóúýäëïöüÿảẻỉỏủỷâêîôûŷàèìòùỳãẽĩõũỹ])[aeiıouy]*q?['bcdfghjklmnprstz]h?[aeiouy])(?![\u0300-\u030f])"
-  p = ("([" + std_vowel_str
-         + "][aeiıouy]*q?['bcdfghjklmnprstz]h?[aeiouy])"
-         + "(?![\u0300-\u030f])")
-  s = re.sub(p, "\\1\u0304", s, overlapped=True)
-  s = unicodedata.normalize("NFC", s)
   return s
 
 def is_an_inflected_contentive(s):
@@ -168,7 +152,7 @@ def is_a_contentive_lemma(s):
 def is_a_lemma(s):
   return (
     is_a_contentive_lemma(s) or s in (
-      toneless_particles | particles_with_lexical_tone | interjections))
+      toneless_particles | functors_with_lexical_tone | interjections))
 
 def __is_an_interjection(s):
   return None != re.match(
