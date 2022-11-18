@@ -26,7 +26,7 @@ std_consonants = std_initials + ("q",)
 
 # ==================================================================== #
 
-quantifiers = {"sa", "sıa", "tu", "tushı", "tuq", "tuqshı", "ja", "ke", "hı", "co", "baq", "hoı"}
+quantifiers = {"ke", "sa", "sıa", "tu", "tushı", "tuq", "tuqshı", "baq", "ja", "hı", "co", "hoı"}
 conjunctions = {"ru", "ra", "ro", "rı", "roı"}
 illocutions = {"da", "ba", "ka", "moq", "nha"}
 sentence_prefixes = {"je", "keo", "tıu"}
@@ -36,7 +36,7 @@ prenex_markers = {"bı", "pa"}
 freemod_prefixes = {"ju"}
 
 toneless_particles = (
-  quantifiers | {"to"} | conjunctions | illocutions | sentence_prefixes
+  {"hu", "to"} | quantifiers | conjunctions | illocutions | sentence_prefixes
   | focus_prefixes | terminators | prenex_markers | freemod_prefixes)
 # "sa", "sıa", "tu", "ja", "ke", "hı", "co", "baq", "hoı", "to", "ru", "ra", "ro", "rı", "roı", "da", "ba", "ka", "moq", "fı", "go", "cu", "ta", "je", "keo", "tıu", "ku", "tou", "beı", "bı", "pa", "ju", "la", "kıo", "kı", "teo", "hu", "na", "ga", "cy", "ky"
 
