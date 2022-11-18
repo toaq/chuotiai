@@ -26,7 +26,7 @@ std_consonants = std_initials + ("q",)
 
 # ==================================================================== #
 
-quantifiers = {"sa", "sıa", "tu", "ja", "ke", "hı", "co", "baq", "hoı"}
+quantifiers = {"sa", "sıa", "tu", "tushı", "tuq", "tuqshı", "ja", "ke", "hı", "co", "baq", "hoı"}
 conjunctions = {"ru", "ra", "ro", "rı", "roı"}
 illocutions = {"da", "ba", "ka", "moq", "nha"}
 sentence_prefixes = {"je", "keo", "tıu"}
@@ -100,6 +100,7 @@ def normalized(s):
   s = re.sub("(?<=^)'", "", s)
   s = unicodedata.normalize("NFC", s)
   s = with_carons_replaced_with_diareses(s)
+  s = _with_replaced_characters("āēīōūȳ", "aeıouy")
   if None == re.search(
     "[\sáéíóúýäëïöüÿảẻỉỏủỷâêîôûŷàèìòùỳãẽĩõũỹ]", s, re.IGNORECASE
   ):
