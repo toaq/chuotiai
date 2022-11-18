@@ -36,9 +36,8 @@ prenex_markers = {"bı", "pa"}
 freemod_prefixes = {"ju"}
 
 toneless_particles = (
-  quantifiers | {"to"} | conjunctions | illocutions | linkers
-  | sentence_prefixes | focus_prefixes | terminators | prenex_markers
-  | freemod_prefixes)
+  quantifiers | {"to"} | conjunctions | illocutions | sentence_prefixes
+  | focus_prefixes | terminators | prenex_markers | freemod_prefixes)
 # "sa", "sıa", "tu", "ja", "ke", "hı", "co", "baq", "hoı", "to", "ru", "ra", "ro", "rı", "roı", "da", "ba", "ka", "moq", "fı", "go", "cu", "ta", "je", "keo", "tıu", "ku", "tou", "beı", "bı", "pa", "ju", "la", "kıo", "kı", "teo", "hu", "na", "ga", "cy", "ky"
 
 
@@ -90,6 +89,9 @@ def lemma_of(s):
   return diacriticless_normalized(s)
 
 def normalized(s):
+  assert isinstance(s, str)
+  if s == "":
+    return s
   # Normalizing nonstandard characters:
   s = s.strip()
   s = re.sub("[x’]", "'", s)
