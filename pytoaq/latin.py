@@ -100,7 +100,7 @@ def normalized(s):
   s = re.sub("(?<=^)'", "", s)
   s = unicodedata.normalize("NFC", s)
   s = with_carons_replaced_with_diareses(s)
-  s = _with_replaced_characters("āēīōūȳ", "aeıouy")
+  s = _with_replaced_characters(s, "āēīōūȳ", "aeıouy")
   if None == re.search(
     "[\sáéíóúýäëïöüÿảẻỉỏủỷâêîôûŷàèìòùỳãẽĩõũỹ]", s, re.IGNORECASE
   ):
