@@ -1,8 +1,8 @@
 <!doctype html>
 <html>
-<body>
-  <meta charset='utf-8' />
+<meta charset='utf-8' />
 
+<body>
   <link rel="stylesheet" type="text/css" href="toaq.css">
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js">
@@ -42,13 +42,16 @@
     };
     
     function normalized(toa) {
+      console.assert(
+        is_string(toa),
+        "ERROR: normalized(): The argument is not a string!");
       return toa.normalize('NFD')
+                .toLowerCase()
                 .replace(/i/g, 'ı')
                 .replace(/[\u0300-\u030f]/g, '')
                 .replace(/[^0-9A-Za-zı'_\-]+/g, ' ')
                 .replace(/ +/g, ' ')
-                .trim()
-                .toLowerCase();
+                .trim();
     }
     
     function get_definition(entry, language) {
@@ -66,7 +69,7 @@
     
     function tooltip_html_from_toaq_text(dictionary, text) {
       /*** AUTOMATIC WORD DEFINITION TOOLTIPS FOR TOAQ TEXTS ***/
-      // `dictionary` is the content of the loaded dictionary.json.
+      // `dictionary` is the content of the loaded dictionary JSON.
       var hoetoalai = "'’a-zA-Zıāēīōūȳáéíóúýäëïöüÿǎěǐǒǔảẻỉỏủỷâêîôûŷàèìòùỳãẽĩõũỹ"
                   + "ĀĒĪŌŪȲÁÉÍÓÚÝÄËÏÖÜŸǍĚǏǑǓẢẺỈỎỦỶÂÊÎÔÛŶÀÈÌÒÙỲÃẼĨÕŨỸ"
                   + "\u0300-\u030f";
@@ -91,8 +94,8 @@
             (removing diacritics and having dotless i's: */
           var normalized_word = normalized(item);
           // Now we look up the dictionary for the word:
-          dictionary.forEach(function (entry, i, arr) {
-            function f(toaq) {
+          dictionary.every(function (entry, i, arr) {
+            function f(toaq, is_official) {
               if (normalized(toaq) == normalized_word) {
                 // We have found the word in the dictionary.
                 // Now we fetch its definition and check if it isn't empty.
@@ -100,25 +103,34 @@
                 if (def) {
                   def = with_escaped_html(def);
                   // Now we create a tooltip containing its definition:
-                  var tip = entry.official ? "tip" : "tip-unofficial tip";
-                  var tiptext = entry.official ?
+                  var tip = is_official ? "tip" : "tip-unofficial tip";
+                  var tiptext = is_official ?
                     "tiptext" : "tiptext-unofficial tiptext";
                   array[index] = '<div class="' + tip + '">'
                      + item + '<span class="' + tiptext + '">'
                      + normalized_word + ' : ' + def + '</span></div>';
                 }
-              }
+                return true;
+              } else return false
             }
-            if (is_string(entry.toaq)) {
-              f(entry.toaq);
-            } else if (is_array(entry.toaq)) {
-              entry.toaq.forEach(f);
-            } else {
-              console.log("TYPE ERROR FOR `entry.toaq`: " + Object.prototype.toString.call(entry.toaq));
-            }
+            console.assert(
+              'toaq_forms' in entry && is_array(entry.toaq_forms),
+              "ERROR: No valid `toaq_forms` field in the dictionary entries!");
+            the_word_has_been_found = false;
+            entry.toaq_forms.every(function (e, i, l) {
+              console.assert(
+                is_string(e.toaq) || is_array(e.toaq),
+                 "ERROR: `e.toaq` is not a string or an array but a "
+                 + Object.prototype.toString.call(e.toaq));
+              if (!is_string(e.toaq))
+                return false;
+              the_word_has_been_found = f(e.toaq, e.is_official);
+              return !the_word_has_been_found;
+            });
             /* If we don't find the word in the dictionary, no tooltip
                is created. Nothing will happen when hovering the word
                with the mouse pointer. */
+            return !the_word_has_been_found;
           });
         }
       });
