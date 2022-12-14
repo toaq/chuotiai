@@ -8,57 +8,50 @@ import regex as re, unicodedata
 
 # ==================================================================== #
 
-vowel_str = "aeiıouáéíóúäëïöüâêîôûạẹịı̣ọụ"
-std_vowel_str = "aeıouáéíóúäëïöüâêîôûạẹı̣ọụ"
+vowel_str = "aeiıouyáéíóúýäëïöüÿǎěǐǒǔảẻỉỏủỷâêîôûŷàèìòùỳãẽĩõũỹ"
+std_vowel_str = "aeıouyáéíóúýäëïöüÿảẻỉỏủỷâêîôûŷàèìòùỳãẽĩõũỹ"
 vowels = vowel_str
 std_vowels = std_vowel_str
-consonant_str = "'bcdfghjȷklmnprstzqꝡ"
-initial_str = "'bcdfghjȷklmnprstzꝡ"
-std_consonant_str = "'bcdfghjklmnprstzqꝡ"
-std_initial_str = "'bcdfghjklmnprstzꝡ"
+consonant_str = "'bcdfghjȷklmnprstzq"
+initial_str = "'bcdfghjȷklmnprstz"
+std_consonant_str = "'bcdfghjklmnprstzq"
+std_initial_str = "'bcdfghjklmnprstz"
 charset = vowel_str + consonant_str
 std_charset = std_vowel_str + std_consonant_str
 
-initials = ("m", "b", "p", "f", "n", "d", "t", "z", "c", "s", "r", "l", "nh", "j", "ȷ", "ch", "sh", "ꝡ", "g", "k", "'", "h")
-finals = ("m", "q")
+initials = ("'", "b", "c", "ch", "d", "f", "g", "h", "j", "ȷ", "k", "l", "m", "n", "nh", "p", "r", "s", "sh", "t", "z")
 consonants = initials + ("q",)
-std_initials = ("m", "b", "p", "f", "n", "d", "t", "z", "c", "s", "r", "l", "nh", "j", "ch", "sh", "ꝡ", "g", "k", "'", "h")
+std_initials = ("'", "b", "c", "ch", "d", "f", "g", "h", "j", "k", "l", "m", "n", "nh", "p", "r", "s", "sh", "t", "z")
 std_consonants = std_initials + ("q",)
 
 # ==================================================================== #
 
-matrix_subordinators = {"ꝡa", "ma", "tıo"}
-nominal_subordinators = {"ꝡä", "mä", "tïo", "lä", "ꝡé", "ná"}
-adnominal_subordinators = {"ꝡë", "jü"}
-predicatizers = {"jeı", "mea", "po"}
-quantifiers = {"ló", "ké", "sá", "sía", "tú", "túq", "báq", "já", "hí", "ní", "hú"}
-conjunctions = {"róı", "rú", "rá", "ró", "rí", "kéo"}
-falling_tone_illocutions = {"ka", "da", "ba", "nha", "doa", "ꝡo"}
-peaking_tone_illocutions = {"dâ", "môq"}
-raising_tone_illocutions = {"móq"}
-illocutions = (
-  falling_tone_illocutions | raising_tone_illocutions
-  | peaking_tone_illocutions)
-focus_markers = {"kú", "tóu", "béı"}
-preverbals = {"bï", "nä"}
-vocative = {"hóı"}
-terminators = {"teo", "kı"}
-
-matrix_subordinators = (
-  matrix_subordinators | falling_tone_illocutions | terminators)
-
-functors_with_grammatical_tone = predicatizers | {"mı", "shu", "mo"}
-
-functors_with_lexical_tone = (
-  matrix_subordinators | nominal_subordinators | adnominal_subordinators
-  | quantifiers | conjunctions | illocutions | focus_markers
-  | preverbals | vocative | terminators | {"gö", "kïo"})
-
-functor_lemmas = (
-  functors_with_grammatical_tone | functors_with_lexical_tone)
+quantifiers = {"ke", "sa", "sıa", "tu", "tushı", "tuq", "tuqshı", "baq", "ja", "hı", "co", "hoı"}
+conjunctions = {"ru", "ra", "ro", "rı", "roı"}
+illocutions = {"da", "ba", "ka", "moq", "nha"}
+sentence_initiators = {"je", "keo", "tıu"}
+focus_markers = {"ku", "tou", "beı"}
+terminators = {"na", "ga", "cy", "ky", "teo", "kı"}
+prenex_markers = {"bı", "pa"}
+freemod_prefixes = {"ju"}
 
 toneless_particles = (
-  matrix_subordinators | falling_tone_illocutions | terminators)
+  {"hu", "to"} | quantifiers | conjunctions | illocutions | sentence_initiators
+  | focus_markers | terminators | prenex_markers | freemod_prefixes)
+# "sa", "sıa", "tu", "ja", "ke", "hı", "co", "baq", "hoı", "to", "ru", "ra", "ro", "rı", "roı", "da", "ba", "ka", "moq", "fı", "go", "cu", "ta", "je", "keo", "tıu", "ku", "tou", "beı", "bı", "pa", "ju", "la", "kıo", "kı", "teo", "hu", "na", "ga", "cy", "ky"
+
+
+functors_with_grammatical_tone = {
+  "lu", "po", "jeı", "mea", "mı", "shu", "mo"
+}
+
+functors_with_lexical_tone = {
+  "mả", "mâ", "tỉo", "tîo", "lả", "lâ", "lá", "lä", "lã", "lî"
+}
+
+functor_lemmas = (
+  toneless_particles | functors_with_grammatical_tone
+  | functors_with_lexical_tone)
 
 interjections = {
   'm̄', 'ḿ', 'm̈', 'm̉', 'm̂', 'm̀', 'm̃'
@@ -68,6 +61,9 @@ interjections = {
 
 def is_a_word(s):
   raise NotImplementedError()
+
+def with_carons_replaced_with_diareses(s):
+  return _with_replaced_characters(s, "ǎěǐǒǔ", "äëïöü")
 
 def _with_replaced_characters(str, src_chars, rep_chars):
   i = 0
@@ -103,8 +99,10 @@ def normalized(s):
   s = re.sub("ȷ", "j", s)
   s = re.sub("(?<=^)'", "", s)
   s = unicodedata.normalize("NFC", s)
+  s = with_carons_replaced_with_diareses(s)
+  s = _with_replaced_characters(s, "āēīōūȳ", "aeıouy")
   if None == re.search(
-    "[\sáéíóúäëïöüâêîôû]", s, re.IGNORECASE
+    "[\sáéíóúýäëïöüÿảẻỉỏủỷâêîôûŷàèìòùỳãẽĩõũỹ]", s, re.IGNORECASE
   ):
     # The input is a lemma.
     s = s[0] + s[1:].lower()
@@ -122,13 +120,16 @@ def normalized(s):
         main_vowel_pos = w.index(r[0])
         bare = _with_replaced_characters(
           w,
-          "áéíóúäëïöüâêîôû",
-          "aeıouaeıouaeıou")
+          "áéíóúýäëïöüÿảẻỉỏủỷâêîôûŷàèìòùỳãẽĩõũỹ",
+          "aeıouyaeıouyaeıouyaeıouyaeıouyaeıouy")
         if bare in toneless_particles:
           return bare
         elif bare in functors_with_grammatical_tone:
           pass
         v = w[main_vowel_pos]
+        if v in "aeıouy":
+          # Sparse writing: the default falling tone mark is restored.
+          v = _with_replaced_characters(v, "aeıouy", "ảẻỉỏủỷ")
         w = bare[:main_vowel_pos] + v + bare[main_vowel_pos + 1:]
       return w
     i = 1
@@ -140,15 +141,15 @@ def normalized(s):
 
 def is_an_inflected_contentive(s):
   return None != re.match(
-    ( "([bcdfghjklmnprstzꝡ]h?)?"
-    + "[aeiıouáéíóúäëïöüâêîôû]"
-    + "[aeıou]*[mq]?((['bcdfghjklmnprstzꝡ]h?)[aeıou]+[mq]?)*$" ),
+    ( "([bcdfghjklmnprstz]h?)?"
+    + "[aeiıouyáéíóúýäëïöüÿǎěǐǒǔảẻỉỏủỷâêîôûŷàèìòùỳãẽĩõũỹ]"
+    + "[aeıouy]*q?((['bcdfghjklmnprstz]h?)[aeıouy]+q?)*$" ),
     s)
 
 def is_a_contentive_lemma(s):
   return None != re.match(
-    ( "([bcdfghjklmnprstzꝡ]h?)?[aeıou]+[mq]?"
-    + "((['bcdfghjklmnprstzꝡ]h?)[aeıou]+[mq]?)*$" ),
+    ( "([bcdfghjklmnprstz]h?)?[aeıouy]+q?"
+    + "((['bcdfghjklmnprstz]h?)[aeıouy]+q?)*$" ),
     s)
 
 def is_a_lemma(s):
@@ -158,7 +159,7 @@ def is_a_lemma(s):
 
 def __is_an_interjection(s):
   return None != re.match(
-      u"[áéíóúäëïöüâêîôû][aeiıou]*$", s)
+      u"[áéíóúýäëïöüÿǎěǐǒǔảẻỉỏủỷâêîôûŷàèìòùỳãẽĩõũỹ][aeiıouy]*$", s)
 
 # ==================================================================== #
 
