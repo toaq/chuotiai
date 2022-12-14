@@ -142,13 +142,13 @@ def is_an_inflected_contentive(s):
   return None != re.match(
     ( "([bcdfghjklmnprstzꝡ]h?)?"
     + "[aeiıouáéíóúäëïöüâêîôû]"
-    + "[aeıou]*[mq]?((['bcdfghjklmnprstzꝡ]h?)[aeıou]+[mq]?)*$" ),
+    + "[aeıou]*[mq]?((['bcdfghjklmnprstzꝡ]h?)[aeıouạẹı̣ọụ]+[mq]?)*$" ),
     s)
 
 def is_a_contentive_lemma(s):
   return None != re.match(
-    ( "([bcdfghjklmnprstzꝡ]h?)?[aeıou]+[mq]?"
-    + "((['bcdfghjklmnprstzꝡ]h?)[aeıou]+[mq]?)*$" ),
+    ( "([bcdfghjklmnprstzꝡ]h?)?[aeıouạẹı̣ọụ]+[mq]?"
+    + "((['bcdfghjklmnprstzꝡ]h?)[aeıouạẹı̣ọụ]+[mq]?)*$" ),
     s)
 
 def is_a_lemma(s):
