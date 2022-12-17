@@ -24,6 +24,7 @@ def deranı_from_latin(lt):
   lt = lt.replace("i", "ı")
   lt = re.sub("([aeıou])([́̈̂])", r"\2\1", lt)
   lt = re.sub("(?!(aı|ao|eı|oı))([aeıou])([aeıou])", r"\2\3", lt)
+  lt = re.sub("([aeıou])m", r"\1", lt)
   i = 0
   while i < len(lt):
     lt = deranı_from_latin_2(lt, i, deranı_from_latin.map2, 2)
@@ -40,7 +41,6 @@ def deranı_from_latin_2(lt, i, m, l):
 
 deranı_from_latin.map1 = {
   "m": "",
-  "w": "",
   "b": "",
   "u": "",
   "p": "",
