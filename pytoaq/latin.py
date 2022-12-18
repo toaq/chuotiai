@@ -145,6 +145,44 @@ def normalized(s):
     s = "".join(l)
   return s
 
+def inflected_from_lemma(lemma, tone):
+  assert is_a_lemma(lemma)
+  assert not lemma in functors_with_lexical_tone | interjections
+  i = _first(lemma, lambda c: c in "aeıou")
+  lemma = _with_replaced_interval(
+    lemma, i, i + 1, inflected_vowel(lemma[i], tone))
+  return lemma
+
+def inflected_vowel(vowel, tone):
+  assert vowel in "aeıou"
+  if tone in {"´", "́"}:
+    targets = "áéíóú"
+  elif tone in {"^", "̂"}:
+    targets = "âêîôû"
+  elif tone in {"¨", "̈"}:
+    targets = "äëïöü"
+  else:
+    raise Exception(f"Invalid tone: ⟪{tone}⟫")
+  return _with_replaced_characters(vowel, "aeıou", targets)
+
+def _first(iterable, has_property):
+    i = next(
+      (i for i, e in enumerate(iterable) if has_property(e)),
+      None)
+    if i is None:
+      raise ValueError
+    else:
+      return i
+
+def _with_replaced_interval(s1, i, j, s2):
+  assert isinstance(s1, str)
+  assert isinstance(s2, str)
+  assert isinstance(i, int)
+  assert isinstance(j, int)
+  assert i < j
+  return s2.join([s1[:i], s1[j:]])
+
+
 def is_an_inflected_contentive(s):
   return None != re.match(
     ( f"([{std_consonant_str}]h?)?"

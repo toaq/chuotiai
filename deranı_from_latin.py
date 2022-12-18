@@ -52,19 +52,23 @@ def deranı_from_latin_2(lt, i, m, l):
     lt = with_replaced_interval(lt, i, i + l, r)
   return lt
 
-def with_replaced_interval(s, i, j, s2):
-  assert isinstance(s, str)
+def with_replaced_interval(s1, i, j, s2):
+  assert isinstance(s1, str)
   assert isinstance(s2, str)
   assert isinstance(i, int)
   assert isinstance(j, int)
   assert i < j
-  return s2.join([s[:i], s[j:]])
+  return s2.join([s1[:i], s1[j:]])
 
 NFD_cartoucheless_words = {
   unicodedata.normalize("NFD", p).replace("i", "ı")
   for p in (
     pytoaq.pronouns | pytoaq.determiners
     | pytoaq.functors_with_lexical_tone
+    | {
+      pytoaq.inflected_from_lemma(l, "´")
+      for l in pytoaq.functors_with_grammatical_tone
+    }
   )
 }
 
