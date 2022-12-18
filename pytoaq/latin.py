@@ -8,14 +8,16 @@ import regex as re, unicodedata
 
 # ==================================================================== #
 
-vowel_str = "aeiıouáéíóúäëïöüâêîôûạẹịı̣ọụ"
-std_vowel_str = "aeıouáéíóúäëïöüâêîôûạẹı̣ọụ"
+vowel_str = "aeiıouáéíóúäëïöüâêîôûạẹịı̣ọụạ́ẹ́ị́ọ́ụ́ạ̈ẹ̈ị̈ọ̈ụ̈ậệị̂ộụ̂"
+std_vowel_str = "aeıouáéíóúäëïöüâêîôûạẹı̣ọụạ́ẹ́ị́ọ́ụ́ạ̈ẹ̈ị̈ọ̈ụ̈ậệị̂ộụ̂"
 vowels = vowel_str
 std_vowels = std_vowel_str
 consonant_str = "'bcdfghjȷklmnprstzqꝡ"
 initial_str = "'bcdfghjȷklmnprstzꝡ"
+word_initial_str = "bcdfghjȷklmnprstzꝡ"
 std_consonant_str = "'bcdfghjklmnprstzqꝡ"
 std_initial_str = "'bcdfghjklmnprstzꝡ"
+std_word_initial_str = "bcdfghjklmnprstzꝡ"
 charset = vowel_str + consonant_str
 std_charset = std_vowel_str + std_consonant_str
 
@@ -31,7 +33,7 @@ matrix_subordinators = {"ꝡa", "ma", "tıo"}
 nominal_subordinators = {"ꝡä", "mä", "tïo", "lä", "ꝡé", "ná"}
 adnominal_subordinators = {"ꝡë", "jü"}
 predicatizers = {"jeı", "mea", "po"}
-quantifiers = {"ló", "ké", "sá", "sía", "tú", "túq", "báq", "já", "hí", "ní", "hú"}
+determiners = {"ló", "ké", "sá", "sía", "tú", "túq", "báq", "já", "hí", "ní", "hú"}
 conjunctions = {"róı", "rú", "rá", "ró", "rí", "kéo"}
 falling_tone_illocutions = {"ka", "da", "ba", "nha", "doa", "ꝡo"}
 peaking_tone_illocutions = {"dâ", "môq"}
@@ -43,6 +45,11 @@ focus_markers = {"kú", "tóu", "béı"}
 preverbals = {"bï", "nä"}
 vocative = {"hóı"}
 terminators = {"teo", "kı"}
+exophoric_pronouns = {
+  "jí", "súq", "nháo", "súna", "nhána", "úmo", "íme", "súho", "áma", "há"
+}
+endophoric_pronouns = {"hó", "máq", "tá", "hóq", "róu", "zé", "bóu", "áq", "chéq"}
+pronouns = exophoric_pronouns | endophoric_pronouns
 
 matrix_subordinators = (
   matrix_subordinators | falling_tone_illocutions | terminators)
@@ -51,7 +58,7 @@ functors_with_grammatical_tone = predicatizers | {"mı", "shu", "mo"}
 
 functors_with_lexical_tone = (
   matrix_subordinators | nominal_subordinators | adnominal_subordinators
-  | quantifiers | conjunctions | illocutions | focus_markers
+  | determiners | conjunctions | illocutions | focus_markers
   | preverbals | vocative | terminators | {"gö", "kïo"})
 
 functor_lemmas = (
@@ -140,15 +147,15 @@ def normalized(s):
 
 def is_an_inflected_contentive(s):
   return None != re.match(
-    ( "([bcdfghjklmnprstzꝡ]h?)?"
-    + "[aeiıouáéíóúäëïöüâêîôû]"
-    + "[aeıou]*[mq]?((['bcdfghjklmnprstzꝡ]h?)[aeıouạẹı̣ọụ]+[mq]?)*$" ),
+    ( f"([{std_consonant_str}]h?)?"
+    + f"[{std_vowel_str}]"
+    + f"[aeıou]*[mq]?(([{std_consonant_str}]h?)[aeıouạẹı̣ọụ]+[mq]?)*$" ),
     s)
 
 def is_a_contentive_lemma(s):
   return None != re.match(
-    ( "([bcdfghjklmnprstzꝡ]h?)?[aeıouạẹı̣ọụ]+[mq]?"
-    + "((['bcdfghjklmnprstzꝡ]h?)[aeıouạẹı̣ọụ]+[mq]?)*$" ),
+    ( f"([{std_word_initial_str}]h?)?[aeıouạẹı̣ọụ]+[mq]?"
+    + f"(([{std_consonant_str}]h?)[aeıouạẹı̣ọụ]+[mq]?)*$" ),
     s)
 
 def is_a_lemma(s):
