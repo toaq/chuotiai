@@ -34,7 +34,11 @@ nominal_subordinators = {"ꝡä", "mä", "tïo", "lä", "ꝡé", "ná"}
 adnominal_subordinators = {"ꝡë", "jü"}
 predicatizers = {"jeı", "mea", "po"}
 determiners = {"ló", "ké", "sá", "sía", "tú", "túq", "báq", "já", "hí", "ní", "hú"}
-conjunctions = {"róı", "rú", "rá", "ró", "rí", "kéo"}
+type_1_conjunctions = {"róı", "rú", "rá", "ró", "rí", "kéo"}
+type_2_conjunctions = {"roı", "ru", "ra", "ro", "rı", "keo"}
+type_3_conjunctions = {"rôı", "rû", "râ", "rô", "rî", "kêo"}
+conjunctions = (
+  type_1_conjunctions | type_2_conjunctions | type_3_conjunctions)
 falling_tone_illocutions = {"ka", "da", "ba", "nha", "doa", "ꝡo"}
 peaking_tone_illocutions = {"dâ", "môq"}
 raising_tone_illocutions = {"móq"}
