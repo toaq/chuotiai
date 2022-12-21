@@ -19,7 +19,7 @@ def deranı_from_latin(lt):
     f"(^|[^{pytoaq.std_consonant_str}])([aeıou](aı|ao|eı|oı))",
     r"\1'\2", lt)
   CUD = "̣" # Combining underdot
-  CAA = "́" # Combinite acute accent
+  CAA = "́" # Combining acute accent
   CS = pytoaq.std_consonant_str + "aeıou" + CUD
   r = f"[{pytoaq.word_initial_str}]h?[aeıou][{CUD}]?[{CAA}][{CS}]*"
   lt = re.sub(r, add_cartouche, lt)
