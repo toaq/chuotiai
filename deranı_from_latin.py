@@ -16,7 +16,7 @@ def deranı_from_latin(lt):
   lt = unicodedata.normalize("NFD", lt)
   lt = lt.replace("i", "ı")
   lt = re.sub(
-    f"(^|[^{pytoaq.std_consonant_str}])([aeıou](aı|ao|eı|oı))",
+    f"(^|[^{pytoaq.std_consonant_str}])([aeıou](aı|ao|eı|oı|s|f|c|g|b))",
     r"\1'\2", lt)
   CUD = "̣" # Combining underdot
   CAA = "́" # Combining acute accent
