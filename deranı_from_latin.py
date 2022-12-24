@@ -28,6 +28,7 @@ def deranı_from_latin(lt):
   FTW = f"[{C}]h?[{V}]{CUD}?(?![{T}])[{C+V+CUD}]*"  # Falling Tone Word
   DET = normalized_re_from_wordset(pytoaq.determiners)
   TLP = normalized_re_from_wordset(pytoaq.toneless_particles)
+  MS = normalized_re_from_wordset(pytoaq.matrix_subordinators)
   RRL = (  # Rewrite Rule List
     (f"(^|[^{L}])([{V}]({D}|s|f|c|g|b))", r"\1'\2"),
     # ↑ Adding glottal stop marks ⟪'⟫ to word-initial vowels.
@@ -45,7 +46,7 @@ def deranı_from_latin(lt):
     (f"([^{L}]+)(teo)(?![{L}])", r"\1 \2"),
     # ↑ Adding quote marks in MO—TEO quotes.
     (f"([{L}]+)", r"\1"),
-    (f":([{L}]+):", r"\1"),
+    (f"[:‹]([{L}]+)[›:]", r"\1"),
     # ↑ Adding quote marks around onomastic predicates.
     # ↑ The ⟪⟫ control tag will be prepended by this program to target onomastic predicates, before this rewrite rule is applied.
     (f"̣([́̂{CUD}]?[{V}]?[mq]?)([{C}])", r"\1\2"),
@@ -55,6 +56,7 @@ def deranı_from_latin(lt):
     (f"(?!({D}))([{V}])((?!({D}))[{V}])", r"\2" + DHM + r"\3"),
     # ↑ Adding hiatus marks to non-diphthong vowel sequences.
     (f" (da)(?![{L}])", r" \1 "),
+    (f"(?<=[{L}])([^{L}]*)({MS}|$)", r" \1\2"),
     # ↑ Adding assertive sentence end marks.
     (f" (ka|ba|nha|doa|ꝡo|dâ|môq)(?![{L}])", r" \1 "),
     # ↑ Adding non-assertive non-interrogative sentence end marks.
@@ -67,7 +69,7 @@ def deranı_from_latin(lt):
   )
   # ==== #
   lt = unicodedata.normalize("NFD", lt)
-  lt = re.sub("(?<![A-Za-zı])(:?[A-Z])", r"\1", lt)
+  lt = re.sub("(?<![A-Za-zı])([:‹]?[A-Z])", r"\1", lt)
   lt = re.sub(f"(^|([.…?!]|mo[{T}])\s+)(?!:)", r"\1", lt)
   lt = lt.lower()
   lt = lt.replace("i", "ı")
