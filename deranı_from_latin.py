@@ -41,6 +41,11 @@ def deranı_from_latin(lt):
     # ↑ Adding cartouches and name marks on MÍ and SHÚ phrases.
     (f"(?<![{L}])(mo[{T}]?)([^{L}]+)", r"\1 \2"),
     (f"([^{L}]+)(teo)(?![{L}])", r"\1 \2"),
+    # ↑ Adding quote marks in MO—TEO quotes.
+    (f"([{L}]+)", r"\1"),
+    (f":([{L}]+):", r"\1"),
+    # ↑ Adding quote marks around onomastic predicates.
+    # ↑ The ⟪⟫ control tag will be prepended by this program to target onomastic predicates, before this rewrite rule is applied.
     (f"̣([́̂{CUD}]?[{V}]?[mq]?)([{C}])", r"\1\2"),
     # ↑ Adding prefix-root delineators ⟪⟫.
     (f"([{V}])([{T}])", r"\2\1"),
@@ -55,10 +60,12 @@ def deranı_from_latin(lt):
     # ↑ Adding interrogative sentence end marks.
     (f"([{V}])m", r"\1"),
     # ↑ Mapping coda ⟪m⟫ to the dedicated Deranı glyph.
-    ("[.…?]", "")
+    ("[.…?!]", "")
     # ↑ Removing needless Latin punctuation.
   )
   # ==== #
+  lt = re.sub("(?<![A-Za-zı])(:?[A-Z])", r"\1", lt)
+  lt = re.sub("(^|[.…?!]\s+)(?!:)", r"\1", lt)
   lt = lt.lower()
   lt = unicodedata.normalize("NFD", lt)
   lt = lt.replace("i", "ı")
