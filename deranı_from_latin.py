@@ -82,9 +82,6 @@ def deranı_from_latin(lt):
     return True
   traverse_while(lambda i: i < len(lt), f)
   return lt
-  # TODO:
-  #   ◆ Cartouches on SHU/MI.
-  #   ◆ ⟪▓▓⟫: shu-names, onomastics
 
 def traverse_while(ℙ1, ℙ2 = lambda _: True, init = 0, step = 1):
   # Homologuous to a C-language “for” loop.
