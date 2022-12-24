@@ -41,14 +41,14 @@ def deranı_from_latin(lt):
     # ↑ Moving tone marks before the first vowel.
     (f"(?!({D}))([{V}])((?!({D}))[{V}])", r"\2" + DHM + r"\3"),
     # ↑ Adding hiatus marks to non-diphthong vowel sequences.
-    (f"([{V}])m", r"\1"),
-    # ↑ Mapping coda ⟪m⟫ to the dedicated Deranı glyph.
     (f" (da)(?![{L}])", r" \1 "),
     # ↑ Adding assertive sentence end marks.
     (f" (ka|ba|nha|doa|ꝡo|dâ|môq)(?![{L}])", r" \1 "),
     # ↑ Adding non-assertive non-interrogative sentence end marks.
     (f" (móq)(?![{L}])", r" \1 "),
     # ↑ Adding interrogative sentence end marks.
+    (f"([{V}])m", r"\1"),
+    # ↑ Mapping coda ⟪m⟫ to the dedicated Deranı glyph.
     ("[.…?]", "")
     # ↑ Removing needless Latin punctuation.
   )
