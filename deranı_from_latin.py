@@ -66,10 +66,10 @@ def deranı_from_latin(lt):
     # ↑ Removing needless Latin punctuation.
   )
   # ==== #
-  lt = re.sub("(?<![A-Za-zı])(:?[A-Z])", r"\1", lt)
-  lt = re.sub("(^|[.…?!]\s+)(?!:)", r"\1", lt)
-  lt = lt.lower()
   lt = unicodedata.normalize("NFD", lt)
+  lt = re.sub("(?<![A-Za-zı])(:?[A-Z])", r"\1", lt)
+  lt = re.sub(f"(^|([.…?!]|mo[{T}])\s+)(?!:)", r"\1", lt)
+  lt = lt.lower()
   lt = lt.replace("i", "ı")
   for rr in RRL:  # Applying the rewrite rules.
     lt = re.sub(rr[0], rr[1], lt)
