@@ -50,6 +50,7 @@ def deranı_from_latin(lt):
     (f" (móq)(?![{L}])", r" \1 "),
     # ↑ Adding interrogative sentence end marks.
     ("[.…?]", "")
+    # ↑ Removing needless Latin punctuation.
   )
   # ==== #
   lt = lt.lower()
