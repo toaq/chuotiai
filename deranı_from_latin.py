@@ -51,17 +51,17 @@ def deranı_from_latin(lt):
     # ↑ The ⟪⟫ control tag will be prepended by this program to target onomastic predicates, before this rewrite rule is applied.
     (f"̣([́̂{CUD}]?[{V}]?[mq]?)([{C}])", r"\1\2"),
     # ↑ Adding prefix-root delineators ⟪⟫.
-    (f"([{V}])([{T}])", r"\2\1"),
-    # ↑ Moving tone marks before the first vowel.
     (f"(?!({D}))([{V}])((?!({D}))[{V}])", r"\2" + DHM + r"\3"),
     # ↑ Adding hiatus marks to non-diphthong vowel sequences.
     (f" (da)(?![{L}])", r" \1 "),
-    (f"(?<=[{L}])([^{L}]*)({MS}|$)", r" \1\2"),
+    (f"(?<=[{L}])(?<!mo)(?<!m[{T}]o)([^{L}]*)(({MS})(?![{L}{T}])|$)", r" \1\2"),
     # ↑ Adding assertive sentence end marks.
-    (f" (ka|ba|nha|doa|ꝡo|dâ|môq)(?![{L}])", r" \1 "),
+    (f" (ka|ba|nha|doa|ꝡo|dâ|môq)(?![{L}{T}])", r" \1 "),
     # ↑ Adding non-assertive non-interrogative sentence end marks.
     (f" (móq)(?![{L}])", r" \1 "),
     # ↑ Adding interrogative sentence end marks.
+    (f"([{V}])([{T}])", r"\2\1"),
+    # ↑ Moving tone marks before the first vowel.
     (f"([{V}])m", r"\1"),
     # ↑ Mapping coda ⟪m⟫ to the dedicated Deranı glyph.
     ("[.…?!]", "")
