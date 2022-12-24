@@ -36,9 +36,11 @@ def deranı_from_latin(lt):
     (f"(?<![{L}])({DET})([^{L}]+|$)", r"\1\2"),
     (f"([^])({FTW})?", add_t1_cartouche),
     # ↑ Adding empty cartouches and falling-tone word cartouches.
-    (f"(?<![{L}])(mı́|shú)([^{L}]+)(([^{L}]*(?!({TLP})([^{L}]|$)){FTW})+)(?![{L}])",
+    (f"(?<![{L}])(mı́|shú)([^{L}]+)([^{L}]*(?!({TLP})([^{L}]|$)){FTW})(?![{L}])",
      r"\1\2\3"),
-    # ↑ Adding cartouches and name marks on MÍ and SHÚ phrases.
+    (f"(?<![{L}])(mı|shu)([{T}]?[^{L}]+)([^{L}]*(?!({TLP})([^{L}]|$)){FTW})(?![{L}])",
+     r"\1\2\3"),
+    # ↑ Adding cartouches and name marks on MI and SHU phrases.
     (f"(?<![{L}])(mo[{T}]?)([^{L}]+)", r"\1 \2"),
     (f"([^{L}]+)(teo)(?![{L}])", r"\1 \2"),
     # ↑ Adding quote marks in MO—TEO quotes.
