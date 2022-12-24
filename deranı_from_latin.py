@@ -16,7 +16,9 @@ def entrypoint(self_path, latin_toaq):
 def deranı_from_latin(lt):
   monograph_map = deranı_from_latin.monograph_map
   digraph_map = deranı_from_latin.digraph_map
-  C = pytoaq.std_consonant_str
+  C = pytoaq.std_consonant_str # Toaq Consonant character
+  V = pytoaq.std_vowel_str # Toaq Vowel
+  L = pytoaq.std_charset # Toaq Letter
   T = "́̈̂" # Tone marks (◌́, ◌̂, ◌̂)
   CAA = "́" # Combining Acute Accent
   CUD = "̣" # Combining Underdot
@@ -26,27 +28,28 @@ def deranı_from_latin(lt):
   DET = (unicodedata.normalize("NFD", "|".join(pytoaq.determiners))
          .replace("i", "ı"))
   RRL = (  # Rewrite Rule List
-    (f"(^|[^{C}aeıou])([aeıou]({D}|s|f|c|g|b))", r"\1'\2"),
+    (f"(^|[^{L}])([{V}]({D}|s|f|c|g|b))", r"\1'\2"),
     # ↑ Adding glottal stop marks ⟪'⟫ to word-initial vowels.
-    (f"[{C}]h?[aeıou][{CUD}]?[{CAA}][{CVD}]*", add_t2_cartouche),
+    (f"[{C}]h?[{V}][{CUD}]?[{CAA}][{CVD}]*", add_t2_cartouche),
     # ↑ Adding cartouches to suitable ⟪◌́ ⟫-toned words.
-    (f"(?<![{C}aeıou])({DET})([^{C}aeıou]+|$)", r"\1\2"),
-    (f"([^])([{C}]h?[aeıou]{CUD}?(?![{T}])[{C}aeıou{CUD}]*)?", add_t1_cartouche),
+    (f"(?<![{L}])({DET})([^{L}]+|$)", r"\1\2"),
+    (f"([^])([{C}]h?[{V}]{CUD}?(?![{T}])[{C+V+CUD}]*)?", add_t1_cartouche),
     # ↑ Adding empty cartouches and falling-tone word cartouches.
-    (f"̣([́̂{CUD}]?[aeıou]?[mq]?)([{C}])", r"\1\2"),
+    (f"̣([́̂{CUD}]?[{V}]?[mq]?)([{C}])", r"\1\2"),
     # ↑ Adding prefix-root delineators ⟪⟫.
-    (f"([aeıou])([{T}])", r"\2\1"),
+    (f"([{V}])([{T}])", r"\2\1"),
     # ↑ Moving tone marks before the first vowel.
-    (f"(?!({D}))([aeıou])((?!({D}))[aeıou])", r"\2" + DHM + r"\3"),
+    (f"(?!({D}))([{V}])((?!({D}))[{V}])", r"\2" + DHM + r"\3"),
     # ↑ Adding hiatus marks to non-diphthong vowel sequences.
-    ("([aeıou])m", r"\1"),
+    (f"([{V}])m", r"\1"),
     # ↑ Mapping coda ⟪m⟫ to the dedicated Deranı glyph.
-    (" (da)[.…]", r" \1 "),
+    (f" (da)(?![{L}])", r" \1 "),
     # ↑ Adding assertive sentence end marks.
-    (" (ka|ba|nha|doa|ꝡo|dâ|môq)[.…]", r" \1 "),
+    (f" (ka|ba|nha|doa|ꝡo|dâ|môq)(?![{L}])", r" \1 "),
     # ↑ Adding non-assertive non-interrogative sentence end marks.
-    (" (móq)[.…?]", r" \1 ")
+    (f" (móq)(?![{L}])", r" \1 "),
     # ↑ Adding interrogative sentence end marks.
+    ("[.…?]", "")
   )
   # ==== #
   lt = lt.lower()
@@ -154,11 +157,11 @@ deranı_from_latin.monograph_map = {
 #  "̣": "",
   ":": "",
   ",": " ",
-  "[": "",
-  "]": "",
-  ".": " ",
-  ";": " ",
-  "?": " "
+#  "[": "",
+#  "]": "",
+#  ".": " ",
+#  ";": " ",
+#  "?": " "
 }
 
 deranı_from_latin.digraph_map = {
