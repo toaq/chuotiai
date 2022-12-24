@@ -76,7 +76,6 @@ def deranı_from_latin(lt):
   lt = lt.replace("i", "ı")
   for rr in RRL:  # Applying the rewrite rules.
     lt = re.sub(rr[0], rr[1], lt)
-    print(lt)
   def f(i): # Body for the forthcoming loop.
     # Mapping digraphs and monographs to Deranı glyphs:
     nonlocal lt
