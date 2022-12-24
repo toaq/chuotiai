@@ -36,8 +36,8 @@ def deranı_from_latin(lt):
     (f"(?<![{L}])({DET})([^{L}]+|$)", r"\1\2"),
     (f"([^])({FTW})?", add_t1_cartouche),
     # ↑ Adding empty cartouches and falling-tone word cartouches.
-    (f"(?<![{L}])(mı́|shú)(([^{L}]+(?!({TLP})([^{L}]|$)){FTW})+)(?![{L}])",
-     r"\1\2"),
+    (f"(?<![{L}])(mı́|shú)([^{L}]+)(([^{L}]*(?!({TLP})([^{L}]|$)){FTW})+)(?![{L}])",
+     r"\1\2\3"),
     (f"̣([́̂{CUD}]?[{V}]?[mq]?)([{C}])", r"\1\2"),
     # ↑ Adding prefix-root delineators ⟪⟫.
     (f"([{V}])([{T}])", r"\2\1"),
