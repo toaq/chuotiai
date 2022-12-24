@@ -31,7 +31,7 @@ def deranı_from_latin(lt):
     (f"[{C}]h?[aeıou][{CUD}]?[{CAA}][{CVD}]*", add_t2_cartouche),
     # ↑ Adding cartouches to suitable ⟪◌́ ⟫-toned words.
     (f"(?<![{C}aeıou])({DET})([^{C}aeıou]+|$)", r"\1\2"),
-    (f"([^])([{C}]h?[aeıou]{CUD}?(?![{T}])[a-zı{CUD}]*)?", add_t1_cartouche),
+    (f"([^])([{C}]h?[aeıou]{CUD}?(?![{T}])[{C}aeıou{CUD}]*)?", add_t1_cartouche),
     # ↑ Adding empty cartouches and falling-tone word cartouches.
     (f"̣([́̂{CUD}]?[aeıou]?[mq]?)([{C}])", r"\1\2"),
     # ↑ Adding prefix-root delineators ⟪⟫.
@@ -66,7 +66,7 @@ def deranı_from_latin(lt):
   traverse_while(lambda i: i < len(lt), f)
   return lt
   # TODO:
-  #   ◆ Cartouches on PO/SHU/MO.
+  #   ◆ Cartouches on SHU/MI.
   #   ◆ ⟪▓▓⟫: shu-names, onomastics
 
 def traverse_while(ℙ1, ℙ2 = lambda _: True, init = 0, step = 1):
@@ -91,7 +91,8 @@ NFD_cartoucheless_words = {
     | pytoaq.functors_with_lexical_tone
     | {
       pytoaq.inflected_from_lemma(l, "´")
-      for l in pytoaq.functors_with_grammatical_tone
+      for l in (
+        pytoaq.functors_with_grammatical_tone - pytoaq.predicatizers)
     }
   )
 }
