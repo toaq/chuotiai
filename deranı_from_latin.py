@@ -6,51 +6,75 @@
 import sys, unicodedata, re
 import pytoaq.latin as pytoaq
 
+# ==================================================================== #
+
 def entrypoint(self_path, latin_toaq):
   assert(isinstance(latin_toaq, str))
   sys.stdout.write(f"{deranı_from_latin(latin_toaq)}\n")
   return
 
 def deranı_from_latin(lt):
+  monograph_map = deranı_from_latin.monograph_map
+  digraph_map = deranı_from_latin.digraph_map
+  C = pytoaq.std_consonant_str
+  T = "́̈̂" # Tone marks (◌́, ◌̂, ◌̂)
+  CAA = "́" # Combining Acute Accent
+  CUD = "̣" # Combining Underdot
+  CVD = C + "aeıou" + CUD # Consonant, Vowel, Dot
+  D = "aı|ao|eı|oı" # Diphthong
+  DHM = "" # Deranı Hiatus mark
+  DET = (unicodedata.normalize("NFD", "|".join(pytoaq.determiners))
+         .replace("i", "ı"))
+  RRL = (  # Rewrite Rule List
+    (f"(^|[^{C}aeıou])([aeıou]({D}|s|f|c|g|b))", r"\1'\2"),
+    # ↑ Adding glottal stop marks ⟪'⟫ to word-initial vowels.
+    (f"[{C}]h?[aeıou][{CUD}]?[{CAA}][{CVD}]*", add_t2_cartouche),
+    # ↑ Adding cartouches to suitable ⟪◌́ ⟫-toned words.
+    (f"(?<![{C}aeıou])({DET})([^{C}aeıou]+|$)", r"\1\2"),
+    (f"([^])([{C}]h?[aeıou]{CUD}?(?![{T}])[a-zı{CUD}]*)?", add_t1_cartouche),
+    # ↑ Adding empty cartouches and falling-tone word cartouches.
+    (f"̣([́̂{CUD}]?[aeıou]?[mq]?)([{C}])", r"\1\2"),
+    # ↑ Adding prefix-root delineators ⟪⟫.
+    (f"([aeıou])([{T}])", r"\2\1"),
+    # ↑ Moving tone marks before the first vowel.
+    (f"(?!({D}))([aeıou])((?!({D}))[aeıou])", r"\2" + DHM + r"\3"),
+    # ↑ Adding hiatus marks to non-diphthong vowel sequences.
+    ("([aeıou])m", r"\1"),
+    # ↑ Mapping coda ⟪m⟫ to the dedicated Deranı glyph.
+    (" (da)[.…]", r" \1 "),
+    # ↑ Adding assertive sentence end marks.
+    (" (ka|ba|nha|doa|ꝡo|dâ|môq)[.…]", r" \1 "),
+    # ↑ Adding non-assertive non-interrogative sentence end marks.
+    (" (móq)[.…?]", r" \1 ")
+    # ↑ Adding interrogative sentence end marks.
+  )
+  # ==== #
   lt = lt.lower()
   lt = unicodedata.normalize("NFD", lt)
   lt = lt.replace("i", "ı")
-  lt = re.sub(
-    f"(^|[^{pytoaq.std_consonant_str}])([aeıou](aı|ao|eı|oı|s|f|c|g|b))",
-    r"\1'\2", lt)
-  CUD = "̣" # Combining underdot
-  CAA = "́" # Combining acute accent
-  CS = pytoaq.std_consonant_str + "aeıou" + CUD
-  r = f"[{pytoaq.word_initial_str}]h?[aeıou][{CUD}]?[{CAA}][{CS}]*"
-  lt = re.sub(r, add_cartouche, lt)
-  lt = re.sub(
-    f"̣([́̂{CUD}]?[aeıou]?[mq]?)([{pytoaq.std_consonant_str}])", r"\1\2",
-    lt)
-  lt = re.sub("([aeıou])([́̈̂])", r"\2\1", lt)
-  lt = re.sub(
-    "(?!(aı|ao|eı|oı))([aeıou])((?!(aı|ao|eı|oı))[aeıou])", r"\2\3", lt)
-  lt = re.sub("([aeıou])m", r"\1", lt)
-  lt = re.sub(" (da)[.…]", r" \1 ", lt)
-  lt = re.sub(" (ka|ba|nha|doa|ꝡo|dâ|môq)[.…]", r" \1 ", lt)
-  lt = re.sub(" (móq)[.…?]", r" \1 ", lt)
-  i = 0
-  while i < len(lt):
-    lt = deranı_from_latin_2(lt, i, deranı_from_latin.map2, 2)
-    lt = deranı_from_latin_2(lt, i, deranı_from_latin.map1, 1)
-    i += 1
+  for rr in RRL:  # Applying the rewrite rules.
+    lt = re.sub(rr[0], rr[1], lt)
+  def f(i): # Body for the forthcoming loop.
+    # Mapping digraphs and monographs to Deranı glyphs:
+    nonlocal lt
+    for (m, l) in ((digraph_map, 2), (monograph_map, 1)):
+      l = min(l, len(lt) - i)
+      r = m.get(lt[i : i + l])
+      if r is not None:
+        lt = with_replaced_interval(lt, i, i + l, r)
+    return True
+  traverse_while(lambda i: i < len(lt), f)
   return lt
   # TODO:
-  #   ◆ Cartouches : handle PO, SHU, MO…
-  #   ◆ Cartouches : t1 words following determiners.
-  #   ◆ Empty cartouche
+  #   ◆ Cartouches on PO/SHU/MO.
   #   ◆ ⟪▓▓⟫: shu-names, onomastics
 
-def deranı_from_latin_2(lt, i, m, l):
-  l = min(l, len(lt) - i)
-  r = m.get(lt[i : i + l])
-  if r is not None:
-    lt = with_replaced_interval(lt, i, i + l, r)
-  return lt
+def traverse_while(ℙ1, ℙ2 = lambda _: True, init = 0, step = 1):
+  # Homologuous to a C-language “for” loop.
+  # The index initialization and incrementation are kept in one place, away from the body of the loop.
+  i = init
+  while ℙ1(i) and ℙ2(i):
+    i += step
 
 def with_replaced_interval(s1, i, j, s2):
   assert isinstance(s1, str)
@@ -72,14 +96,31 @@ NFD_cartoucheless_words = {
   )
 }
 
-def add_cartouche(m):
+def add_t2_cartouche(m):
   w = m.group(0)
   if w not in NFD_cartoucheless_words:
     if all([s not in w for s in ("hụ́", "hụ́")]):
       w = "" + w + ""
   return w
 
-deranı_from_latin.map1 = {
+def add_t1_cartouche(m):
+  α = m.group(1)
+  β = m.group(2)
+  if α in ("", None):
+    r = " "
+  else:
+    if β in ("", None):
+      r = α + " "
+    elif β in pytoaq.toneless_particles:
+      r = α + " " + β
+    else:
+      r = f" {β}"
+  return r
+
+
+# ==================================================================== #
+
+deranı_from_latin.monograph_map = {
   "m": "",
   "b": "",
   "u": "",
@@ -119,7 +160,7 @@ deranı_from_latin.map1 = {
   "?": " "
 }
 
-deranı_from_latin.map2 = {
+deranı_from_latin.digraph_map = {
   "nh": "",
   "ch": "",
   "sh": "",
@@ -130,6 +171,7 @@ deranı_from_latin.map2 = {
   "[]": ""
 }
 
+# ==================================================================== #
 
 # === ENTRY POINT === #
 
