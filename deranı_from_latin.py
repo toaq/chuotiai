@@ -38,6 +38,7 @@ def deranı_from_latin(lt):
     # ↑ Adding empty cartouches and falling-tone word cartouches.
     (f"(?<![{L}])(mı́|shú)([^{L}]+)(([^{L}]*(?!({TLP})([^{L}]|$)){FTW})+)(?![{L}])",
      r"\1\2\3"),
+    # ↑ Adding cartouches and name marks on MÍ and SHÚ phrases.
     (f"̣([́̂{CUD}]?[{V}]?[mq]?)([{C}])", r"\1\2"),
     # ↑ Adding prefix-root delineators ⟪⟫.
     (f"([{V}])([{T}])", r"\2\1"),
