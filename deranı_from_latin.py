@@ -54,7 +54,7 @@ def deranı_from_latin(lt):
     (f"(?!({D}))([{V}])((?!({D}))[{V}])", r"\2" + DHM + r"\3"),
     # ↑ Adding hiatus marks to non-diphthong vowel sequences.
     (f" (da)(?![{L}])", r" \1 "),
-    (f"(?<=[{L}])(?<!mo)(?<!m[{T}]o)([^{L}]*)(({MS})(?![{L}{T}])|$)", r" \1\2"),
+    (f"(?<=[{L}])(?<!mo)(?<!m[{T}]o)([]*)([^{L}]*)(({MS})(?![{L}{T}])|$)", r"\1 \2\3"),
     (" ", ""),
     # ↑ Adding assertive sentence end marks.
     (f" (ka|ba|nha|doa|ꝡo|dâ|môq)(?![{L}{T}])", r" \1 "),
