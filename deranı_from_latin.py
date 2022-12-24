@@ -25,16 +25,19 @@ def deranı_from_latin(lt):
   CVD = C + "aeıou" + CUD # Consonant, Vowel, Dot
   D = "aı|ao|eı|oı" # Diphthong
   DHM = "" # Deranı Hiatus mark
-  DET = (unicodedata.normalize("NFD", "|".join(pytoaq.determiners))
-         .replace("i", "ı"))
+  FTW = f"[{C}]h?[{V}]{CUD}?(?![{T}])[{C+V+CUD}]*"  # Falling Tone Word
+  DET = normalized_re_from_wordset(pytoaq.determiners)
+  TLP = normalized_re_from_wordset(pytoaq.toneless_particles)
   RRL = (  # Rewrite Rule List
     (f"(^|[^{L}])([{V}]({D}|s|f|c|g|b))", r"\1'\2"),
     # ↑ Adding glottal stop marks ⟪'⟫ to word-initial vowels.
     (f"[{C}]h?[{V}][{CUD}]?[{CAA}][{CVD}]*", add_t2_cartouche),
     # ↑ Adding cartouches to suitable ⟪◌́ ⟫-toned words.
     (f"(?<![{L}])({DET})([^{L}]+|$)", r"\1\2"),
-    (f"([^])([{C}]h?[{V}]{CUD}?(?![{T}])[{C+V+CUD}]*)?", add_t1_cartouche),
+    (f"([^])({FTW})?", add_t1_cartouche),
     # ↑ Adding empty cartouches and falling-tone word cartouches.
+    (f"(?<![{L}])(mı́|shú)(([^{L}]+(?!({TLP})([^{L}]|$)){FTW})+)(?![{L}])",
+     r"\1\2"),
     (f"̣([́̂{CUD}]?[{V}]?[mq]?)([{C}])", r"\1\2"),
     # ↑ Adding prefix-root delineators ⟪⟫.
     (f"([{V}])([{T}])", r"\2\1"),
@@ -87,6 +90,9 @@ def with_replaced_interval(s1, i, j, s2):
   assert isinstance(j, int)
   assert i < j
   return s2.join([s1[:i], s1[j:]])
+
+def normalized_re_from_wordset(ws):
+  return unicodedata.normalize("NFD", "|".join(ws)).replace("i", "ı")
 
 NFD_cartoucheless_words = {
   unicodedata.normalize("NFD", p).replace("i", "ı")
