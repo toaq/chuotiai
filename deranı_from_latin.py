@@ -39,6 +39,8 @@ def deranı_from_latin(lt):
     (f"(?<![{L}])(mı́|shú)([^{L}]+)(([^{L}]*(?!({TLP})([^{L}]|$)){FTW})+)(?![{L}])",
      r"\1\2\3"),
     # ↑ Adding cartouches and name marks on MÍ and SHÚ phrases.
+    (f"(?<![{L}])(mo[{T}]?)([^{L}]+)", r"\1 \2"),
+    (f"([^{L}]+)(teo)(?![{L}])", r"\1 \2"),
     (f"̣([́̂{CUD}]?[{V}]?[mq]?)([{C}])", r"\1\2"),
     # ↑ Adding prefix-root delineators ⟪⟫.
     (f"([{V}])([{T}])", r"\2\1"),
