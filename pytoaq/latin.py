@@ -52,11 +52,8 @@ terminators = {"teo", "kı"}
 exophoric_pronouns = {
   "jí", "súq", "nháo", "súna", "nhána", "úmo", "íme", "súho", "áma", "há"
 }
-endophoric_pronouns = {"hó", "máq", "tá", "hóq", "róu", "zé", "bóu", "áq", "chéq"}
+endophoric_pronouns = {"hóa", "hó", "máq", "tá", "hóq", "róu", "zé", "bóu", "áq", "chéq"}
 pronouns = exophoric_pronouns | endophoric_pronouns
-
-matrix_subordinators = (
-  matrix_subordinators | falling_tone_illocutions | terminators)
 
 functors_with_grammatical_tone = predicatizers | {"mı", "shu", "mo"}
 

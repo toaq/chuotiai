@@ -25,14 +25,14 @@ def deranı_from_latin(lt):
   CVD = C + "aeıou" + CUD # Consonant, Vowel, Dot
   D = "aı|ao|eı|oı" # Diphthong
   DHM = "" # Deranı Hiatus mark
-  FTW = f"[{C}]h?[{V}]{CUD}?(?![{T}])[{C+V+CUD}]*"  # Falling Tone Word
+  FTW = f"[{C}]?h?[{V}]{CUD}?(?![{T}])[{C+V+CUD}]*"  # Falling Tone Word
   DET = normalized_re_from_wordset(pytoaq.determiners)
   TLP = normalized_re_from_wordset(pytoaq.toneless_particles)
   MS = normalized_re_from_wordset(pytoaq.matrix_subordinators)
   RRL = (  # Rewrite Rule List
-    (f"(^|[^{L}])([{V}]({D}|s|f|c|g|b))", r"\1'\2"),
+    (f"(^|[^{L}])([{V}][{T}]?({D}|s|f|c|g|b))", r"\1'\2"),
     # ↑ Adding glottal stop marks ⟪'⟫ to word-initial vowels.
-    (f"[{C}]h?[{V}][{CUD}]?[{CAA}][{CVD}]*", add_t2_cartouche),
+    (f"[{C}]?h?[{V}][{CUD}]?[{CAA}][{CVD}]*", add_t2_cartouche),
     # ↑ Adding cartouches to suitable ⟪◌́ ⟫-toned words.
     (f"(?<![{L}])({DET})([^{L}]+|$)", r"\1\2"),
     (f"([^])({FTW})?", add_t1_cartouche),
@@ -55,6 +55,7 @@ def deranı_from_latin(lt):
     # ↑ Adding hiatus marks to non-diphthong vowel sequences.
     (f" (da)(?![{L}])", r" \1 "),
     (f"(?<=[{L}])(?<!mo)(?<!m[{T}]o)([^{L}]*)(({MS})(?![{L}{T}])|$)", r" \1\2"),
+    (" ", ""),
     # ↑ Adding assertive sentence end marks.
     (f" (ka|ba|nha|doa|ꝡo|dâ|môq)(?![{L}{T}])", r" \1 "),
     # ↑ Adding non-assertive non-interrogative sentence end marks.
@@ -75,6 +76,7 @@ def deranı_from_latin(lt):
   lt = lt.replace("i", "ı")
   for rr in RRL:  # Applying the rewrite rules.
     lt = re.sub(rr[0], rr[1], lt)
+    print(lt)
   def f(i): # Body for the forthcoming loop.
     # Mapping digraphs and monographs to Deranı glyphs:
     nonlocal lt
