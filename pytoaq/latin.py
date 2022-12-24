@@ -30,8 +30,8 @@ std_consonants = std_initials + ("q",)
 # ==================================================================== #
 
 matrix_subordinators = {"ꝡa", "ma", "tıo"}
-nominal_subordinators = {"ꝡä", "mä", "tïo", "lä", "ꝡé", "ná"}
-adnominal_subordinators = {"ꝡë", "jü"}
+nominal_subordinators = {"ꝡä", "mä", "tïo", "lä", "ꝡé", "ná", "é"}
+adnominal_subordinators = {"ꝡë", "ë", "jü"}
 predicatizers = {"jeı", "mea", "po"}
 determiners = {"ló", "ké", "sá", "sía", "tú", "túq", "báq", "já", "hí", "ní", "hú"}
 type_1_conjunctions = {"róı", "rú", "rá", "ró", "rí", "kéo"}
