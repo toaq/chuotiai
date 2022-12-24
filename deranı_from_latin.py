@@ -64,13 +64,13 @@ def deranı_from_latin(lt):
     # ↑ Moving tone marks before the first vowel.
     (f"([{V}])m", r"\1"),
     # ↑ Mapping coda ⟪m⟫ to the dedicated Deranı glyph.
-    ("[.…?!]", "")
+    ("[.…?!‹›]", "")
     # ↑ Removing needless Latin punctuation.
   )
   # ==== #
   lt = unicodedata.normalize("NFD", lt)
-  lt = re.sub("(?<![A-Za-zı])([:‹]?[A-Z])", r"\1", lt)
-  lt = re.sub(f"(^|([.…?!]|mo[{T}])\s+)(?!:)", r"\1", lt)
+  lt = re.sub("(?<![A-Za-zı])([A-Z])", r"\1", lt)
+  lt = re.sub(f"(^|([.…?!]|mo[{T}])\s+)", r"\1", lt)
   lt = lt.lower()
   lt = lt.replace("i", "ı")
   for rr in RRL:  # Applying the rewrite rules.
