@@ -31,7 +31,7 @@ def deranı_from_latin(lt):
   MS = normalized_re_from_wordset(pytoaq.matrix_subordinators)
   RRL = (  # Rewrite Rule List
     (f"(^|[^{L}])([{V}][{T}]?({D}|s|f|c|g|b))", r"\1'\2"),
-    # ↑ Adding glottal stop marks ⟪'⟫ to word-initial vowels.
+    # ↑ Adding glottal stop marks ⟪'⟫ to certain word-initial vowels.
     (f"[{C}]?h?[{V}][{CUD}]?[{CAA}][{CVD}]*", add_t2_cartouche),
     # ↑ Adding cartouches to suitable ⟪◌́ ⟫-toned words.
     (f"(?<![{L}])({DET})([^{L}]+|$)", r"\1\2"),
