@@ -24,7 +24,7 @@ def deranı_from_latin(lt):
   CUD = "̣" # Combining Underdot
   CVD = C + "aeıou" + CUD # Consonant, Vowel, Dot
   D = "aı|ao|eı|oı" # Diphthong
-  DHM = "" # Deranı Hiatus mark
+  DHM = "󱛍" # Deranı Hiatus mark
   FTW = f"[{C}]?h?[{V}]{CUD}?(?![{T}])[{C+V+CUD}]*"  # Falling Tone Word
   DET = normalized_re_from_wordset(pytoaq.determiners)
   TLP = normalized_re_from_wordset(pytoaq.toneless_particles)
@@ -38,34 +38,34 @@ def deranı_from_latin(lt):
     (f"([^])({FTW})?", add_t1_cartouche),
     # ↑ Adding empty cartouches and falling-tone word cartouches.
     (f"(?<![{L}])(mı́|shú)([^{L}]+)([^{L}]*(?!({TLP})([^{L}]|$)){FTW})(?![{L}])",
-     r"\1\2\3"),
+     r"󱛘\1\2󱛓\3󱛓󱛙"),
     (f"(?<![{L}])(mı|shu)([{T}]?[^{L}]+)([^{L}]*(?!({TLP})([^{L}]|$)){FTW})(?![{L}])",
-     r"\1\2\3"),
+     r"\1\2󱛓\3󱛓"),
     # ↑ Adding cartouches and name marks on MI and SHU phrases.
-    (f"(?<![{L}])(mo[{T}]?)([^{L}]+)", r"\1 \2"),
-    (f"([^{L}]+)(teo)(?![{L}])", r"\1 \2"),
+    (f"(?<![{L}])(mo[{T}]?)([^{L}]+)", r"\1 󱛓\2"),
+    (f"([^{L}]+)(teo)(?![{L}])", r"\1󱛓 \2"),
     # ↑ Adding quote marks in MO—TEO quotes.
-    (f"([{L}]+)", r"\1"),
-    (f"[:‹]([{L}]+)[›:]", r"\1"),
+    (f"([{L}]+)", r"󱛓\1󱛓"),
+    (f"[:‹]([{L}]+)[›:]", r"󱛓\1󱛓"),
     # ↑ Adding quote marks around onomastic predicates.
     # ↑ The ⟪⟫ control tag will be prepended by this program to target onomastic predicates, before this rewrite rule is applied.
-    (f"̣([́̂{CUD}]?[{V}]?[mq]?)([{C}])", r"\1\2"),
-    # ↑ Adding prefix-root delineators ⟪⟫.
+    (f"̣([́̂{CUD}]?[{V}]?[mq]?)([{C}])", r"\1󱛒\2"),
+    # ↑ Adding prefix-root delineators ⟪󱛒⟫.
     (f"(?!({D}))([{V}])((?!({D}))[{V}])", r"\2" + DHM + r"\3"),
     # ↑ Adding hiatus marks to non-diphthong vowel sequences.
-    (f"(?<=[{L}{T}])(?)([^,{L}{T}]+)(e|na|ꝡe)([{T}])(?![{L}])", r"\1 \2\3\4"),
-    # ↑ Adding ⟪⟫ in places where commas are not used in the Latin script.
-    (f" (da)(?![{L}])", r" \1 "),
-    (f"(?<=[{L}])(?<!mo)(?<!m[{T}]o)([]*)([^{L}]*)(({MS})(?![{L}{T}])|$)", r"\1 \2\3"),
-    (" ", ""),
+    (f"(?<=[{L}{T}])(󱛓?)([^,{L}{T}]+)(e|na|ꝡe)([{T}])(?![{L}])", r"\1 󱛔\2\3\4"),
+    # ↑ Adding ⟪󱛔⟫ in places where commas are not used in the Latin script.
+    (f" (da)(?![{L}])", r" \1 󱛕"),
+    (f"(?<=[{L}])(?<!mo)(?<!m[{T}]o)([󱛓󱛙]*)([^{L}]*)(({MS})(?![{L}{T}])|$)", r"\1 󱛕\2\3"),
+    ("󱛕 󱛕", "󱛕"),
     # ↑ Adding assertive sentence end marks.
-    (f" (ka|ba|nha|doa|ꝡo|dâ|môq)(?![{L}{T}])", r" \1 "),
+    (f" (ka|ba|nha|doa|ꝡo|dâ|môq)(?![{L}{T}])", r" \1 󱛖"),
     # ↑ Adding non-assertive non-interrogative sentence end marks.
-    (f" (móq)(?![{L}])", r" \1 "),
+    (f" (móq)(?![{L}])", r" \1 󱛗"),
     # ↑ Adding interrogative sentence end marks.
     (f"([{V}])([{T}])", r"\2\1"),
     # ↑ Moving tone marks before the first vowel.
-    (f"([{V}])m", r"\1"),
+    (f"([{V}])m", r"\1󱚱"),
     # ↑ Mapping coda ⟪m⟫ to the dedicated Deranı glyph.
     ("[.…?!‹›]", "")
     # ↑ Removing needless Latin punctuation.
@@ -125,75 +125,75 @@ def add_t2_cartouche(m):
   w = m.group(0)
   if w not in NFD_cartoucheless_words:
     if all([s not in w for s in ("hụ́", "hụ́")]):
-      w = "" + w + ""
+      w = "󱛘" + w + "󱛙"
   return w
 
 def add_t1_cartouche(m):
   α = m.group(1)
   β = m.group(2)
   if α in ("", None):
-    r = " "
+    r = " 󱛚"
   else:
     if β in ("", None):
-      r = α + " "
+      r = α + "󱛚 "
     elif β in pytoaq.toneless_particles:
-      r = α + " " + β
+      r = α + "󱛚 " + β
     else:
-      r = f" {β}"
+      r = f" 󱛘{β}󱛙"
   return r
 
 
 # ==================================================================== #
 
 deranı_from_latin.monograph_map = {
-  "m": "",
-  "b": "",
-  "u": "",
-  "p": "",
-  "f": "",
-  "e": "",
-  "n": "",
-  "d": "",
-  "t": "",
-  "z": "",
-  "c": "",
-  "ı": "",
-  "s": "",
-  "a": "",
-  "r": "",
-  "l": "",
-  "j": "",
-  "ꝡ": "",
-  "q": "",
-  "g": "",
-  "o": "",
-  "k": "",
-  "ʼ": "",
-  "'": "",
-  "h": "",
-  "́": "",
-  "̈": "",
-  "̂": "",
-  "-": "",
-#  "̣": "",
-  ":": "",
-  ",": " ",
-#  "[": "",
-#  "]": "",
-#  ".": " ",
-#  ";": " ",
-#  "?": " "
+  "m": "󱚰",
+  "b": "󱚲",
+  "u": "󱚲",
+  "p": "󱚳",
+  "f": "󱚴",
+  "e": "󱚴",
+  "n": "󱚵",
+  "d": "󱚶",
+  "t": "󱚷",
+  "z": "󱚸",
+  "c": "󱚹",
+  "ı": "󱚹",
+  "s": "󱚺",
+  "a": "󱚺",
+  "r": "󱚻",
+  "l": "󱚼",
+  "j": "󱚾",
+  "ꝡ": "󱛁",
+  "q": "󱛂",
+  "g": "󱛃",
+  "o": "󱛃",
+  "k": "󱛄",
+  "ʼ": "󱛅",
+  "'": "󱛅",
+  "h": "󱛆",
+  "́": "󱛊",
+  "̈": "󱛋",
+  "̂": "󱛌",
+  "-": "󱛒",
+#  "̣": "󱛒",
+  ":": "󱛓",
+  ",": " 󱛔",
+#  "[": "󱛘",
+#  "]": "󱛙",
+#  ".": " 󱛕",
+#  ";": " 󱛖",
+#  "?": " 󱛗"
 }
 
 deranı_from_latin.digraph_map = {
-  "nh": "",
-  "ch": "",
-  "sh": "",
-  "aı": "",
-  "ao": "",
-  "oı": "",
-  "eı": "",
-  "[]": ""
+  "nh": "󱚽",
+  "ch": "󱚿",
+  "sh": "󱛀",
+  "aı": "󱚺󱛎󱚹",
+  "ao": "󱚺󱛎󱛃",
+  "oı": "󱛃󱛎󱚹",
+  "eı": "󱚴󱛎󱚹",
+  "[]": "󱛚"
 }
 
 # ==================================================================== #
@@ -201,4 +201,3 @@ deranı_from_latin.digraph_map = {
 # === ENTRY POINT === #
 
 entrypoint(*sys.argv)
-
