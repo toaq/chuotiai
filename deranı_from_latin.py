@@ -30,7 +30,7 @@ def deranı_from_latin(lt):
   TLP = normalized_re_from_wordset(pytoaq.toneless_particles)
   MS = normalized_re_from_wordset(pytoaq.matrix_subordinators)
   RRL = (  # Rewrite Rule List
-    (f"(^|[^{L}])([{V}][{T}]?({D}|s|f|c|g|b))", r"\1'\2"),
+    (f"(^|[^{L}])([{V}][{T}]?(s|f|c|g|b))", r"\1'\2"),
     # ↑ Adding glottal stop marks ⟪'⟫ to certain word-initial vowels.
     (f"[{C}]?h?[{V}][{CUD}]?[{CAA}][{CVD}]*", add_t2_cartouche),
     # ↑ Adding cartouches to suitable ⟪◌́ ⟫-toned words.
@@ -51,7 +51,7 @@ def deranı_from_latin(lt):
     # ↑ The ⟪⟫ control tag will be prepended by this program to target onomastic predicates, before this rewrite rule is applied.
     (f"̣([́̂{CUD}]?[{V}]?[mq]?)([{C}])", r"\1󱛒\2"),
     # ↑ Adding prefix-root delineators ⟪󱛒⟫.
-    (f"(?!({D}))([{V}])((?!({D}))[{V}])", r"\2" + DHM + r"\3"),
+    (f"(?!({D}))([{V}])([{V}])", r"\2" + DHM + r"\3"),
     # ↑ Adding hiatus marks to non-diphthong vowel sequences.
     (f"(?<=[{L}{T}])(󱛓?)([^,{L}{T}]+)(e|na|ꝡe)([{T}])(?![{L}])", r"\1 󱛔\2\3\4"),
     # ↑ Adding ⟪󱛔⟫ in places where commas are not used in the Latin script.
