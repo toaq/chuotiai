@@ -30,29 +30,32 @@ def deranı_from_latin(lt):
   DET = normalized_re_from_wordset(pytoaq.determiners)
   TLP = normalized_re_from_wordset(pytoaq.toneless_particles)
   MS = normalized_re_from_wordset(pytoaq.matrix_subordinators)
+  SSA = "\u0086"  # control character: Start Selected Area
+  ESA = "\u0087"  # control character: End Selected Area
+  PU1 = "\u0091"  # control character: Private Use #1
   RRL = (  # Rewrite Rule List
     (f"(^|[^{L}])([{V}][{T}]?(s|f|c|g|b))", r"\1'\2"),
     # ↑ Adding glottal stop marks ⟪'⟫ to certain word-initial vowels.
     (f"[{C}]?h?[{V}][{CUD}]?[{CAA}][{CVD}]*", add_t2_cartouche),
     # ↑ Adding cartouches to suitable ⟪◌́ ⟫-toned words.
-    (f"(?<![{L}])({DET})([^{L}]+|$)", r"\1\2"),
-    (f"([^])({FTW})?", add_t1_cartouche),
+    (f"(?<![{L}])({DET})([^{L}]+|$)", f"\\1{SSA}\\2{ESA}"),
+    (f"{SSA}([^{ESA}]){ESA}({FTW})?", add_t1_cartouche),
     # ↑ Adding empty cartouches and falling-tone word cartouches.
     (f"(?<![{L}])(mı́|shú)([^{L}]+)((?!({TLP})([^{L}]|$)){FTW})(?![{L}])",
      r"󱛘\1\2󱛓\3󱛓󱛙"),
     (f"(?<![{L}])(mı|shu)([{T34}]?)([^{L}{T}]+)((?!({TLP})([^{L}]|$)){FTW})"
-     + "(?![{L}])",
-     r"\1\2\3󱛓\4󱛓"),
+     + f"(?![{L}])",
+     r"\1\2"+SSA+r"\3"+ESA+r"󱛓\4󱛓"),
     # ↑ Adding cartouches and name marks on MI and SHU phrases.
-    ("(.*)", lambda m: re.sub("\s", " ", m.group(0))),
+    (SSA+"(.*)"+ESA, lambda m: re.sub("\s", " ", m.group(0))),
     # ↑ Cartouches containing more than one word must use non-breaking spaces.
     (f"(?<![{L}])(mo[{T}]?)([^{L}]+)", r"\1 󱛓\2"),
     (f"([^{L}]+)(teo)(?![{L}])", r"\1󱛓 \2"),
     # ↑ Adding quote marks in MO—TEO quotes.
-    (f"([{L}]+)", r"󱛓\1󱛓"),
+    (f"{PU1}([{L}]+)", r"󱛓\1󱛓"),
     (f"[:‹]([{L}]+)[›:]", r"󱛓\1󱛓"),
     # ↑ Adding quote marks around onomastic predicates.
-    # ↑ The ⟪⟫ control tag will be prepended by this program to target onomastic predicates, before this rewrite rule is applied.
+    # ↑ The PU1 control tag will be prepended by this program to target onomastic predicates, before this rewrite rule is applied.
     (f"̣([́̂{CUD}]?[{V}]?[mq]?)([{C}])", r"\1󱛒\2"),
     # ↑ Adding prefix-root delineators ⟪󱛒⟫.
     (f"(?!({D}))([{V}])([{V}])", r"\2" + DHM + r"\3"),
@@ -71,13 +74,13 @@ def deranı_from_latin(lt):
     # ↑ Moving tone marks before the first vowel.
     (f"([{V}])m", r"\1󱚱"),
     # ↑ Mapping coda ⟪m⟫ to the dedicated Deranı glyph.
-    ("[.…?!‹›]", "")
+    (f"[.…?!‹›{PU1}]", "")
     # ↑ Removing needless Latin punctuation.
   )
   # ==== #
   lt = unicodedata.normalize("NFD", lt)
-  lt = re.sub("(?<![A-Za-zı])([A-Z])", r"\1", lt)
-  lt = re.sub(f"(^|([.…?!]|mo[{T}])\s+)", r"\1", lt)
+  lt = re.sub("(?<![A-Za-zı])([A-Z])", PU1+r"\1", lt)
+  lt = re.sub(f"(^|([.…?!]|mo[{T}])\s+)"+PU1, r"\1", lt)
   lt = lt.lower()
   lt = lt.replace("i", "ı")
   for rr in RRL:  # Applying the rewrite rules.
