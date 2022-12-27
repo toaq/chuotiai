@@ -60,15 +60,15 @@ def deranı_from_latin(lt):
     # ↑ Adding prefix-root delineators ⟪󱛒⟫.
     (f"(?!({D}))([{V}])([{V}])", r"\2" + DHM + r"\3"),
     # ↑ Adding hiatus marks to non-diphthong vowel sequences.
-    (f"(?<=[{L}{T}])(󱛓?)([^,{L}{T}]+)(e|na|ꝡe)([{T}])(?![{L}])", r"\1 󱛔\2\3\4"),
+    (f"(?<=[{L}{T}])(󱛓?)([^,{L}{T}]+)(e|na|ꝡe)([{T}])(?![{L}])", r"\1 󱛔\2\3\4"),
     # ↑ Adding ⟪󱛔⟫ in places where commas are not used in the Latin script.
-    (f" (da)(?![{L}])", r" \1 󱛕"),
-    (f"(?<=[{L}])(?<!mo)(?<!m[{T}]o)([󱛓󱛙]*)([^{L}]*)(({MS})(?![{L}{T}])|$)", r"\1 󱛕\2\3"),
-    ("󱛕 󱛕", "󱛕"),
+    (f" (da)(?![{L}])", r" \1 󱛕"),
+    (f"(?<=[{L}])(?<!mo)(?<!m[{T}]o)([󱛓󱛙]*)([^{L}]*)(({MS})(?![{L}{T}])|$)", r"\1 󱛕\2\3"),
+    ("󱛕 󱛕", "󱛕"),
     # ↑ Adding assertive sentence end marks.
-    (f" (ka|ba|nha|doa|ꝡo|dâ|môq)(?![{L}{T}])", r" \1 󱛖"),
+    (f" (ka|ba|nha|doa|ꝡo|dâ|môq)(?![{L}{T}])", r" \1 󱛖"),
     # ↑ Adding non-assertive non-interrogative sentence end marks.
-    (f" (móq)(?![{L}])", r" \1 󱛗"),
+    (f" (móq)(?![{L}])", r" \1 󱛗"),
     # ↑ Adding interrogative sentence end marks.
     (f"([{V}])([{T}])", r"\2\1"),
     # ↑ Moving tone marks before the first vowel.
@@ -139,8 +139,9 @@ def add_t1_cartouche(m):
   α = m.group(1)
   β = m.group(2)
   if α in ("", None):
-    r = " 󱛚"
+    r = " 󱛚"
   else:
+    α = re.sub("\s", " ", α)  # Replacing spaces with non-breaking spaces.
     if β in ("", None):
       r = α + "󱛚 "
     elif β in pytoaq.toneless_particles:
