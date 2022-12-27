@@ -42,7 +42,7 @@ def deranı_from_latin(lt):
     (f"{SSA}([^{ESA}]){ESA}({FTW})?", add_t1_cartouche),
     # ↑ Adding empty cartouches and falling-tone word cartouches.
     (f"(?<![{L}])(mı́|shú)([^{L}]+)((?!({TLP})([^{L}]|$)){FTW})(?![{L}])",
-     r"󱛘\1\2󱛓\3󱛓󱛙"),
+     r"󱛘\1"+SSA+r"\2"+ESA+r"󱛓\3󱛓󱛙"),
     (f"(?<![{L}])(mı|shu)([{T34}]?)([^{L}{T}]+)((?!({TLP})([^{L}]|$)){FTW})"
      + f"(?![{L}])",
      r"\1\2"+SSA+r"\3"+ESA+r"󱛓\4󱛓"),
