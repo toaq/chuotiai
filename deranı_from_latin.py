@@ -20,6 +20,7 @@ def deranı_from_latin(lt):
   V = pytoaq.std_vowel_str # Toaq Vowel
   L = pytoaq.std_charset # Toaq Letter
   T = "́̈̂" # Tone marks (◌́, ◌̂, ◌̂)
+  T34 = "̈̂" # Tone 3 & 4 (◌̂, ◌̂)
   CAA = "́" # Combining Acute Accent
   CUD = "̣" # Combining Underdot
   CVD = C + "aeıou" + CUD # Consonant, Vowel, Dot
@@ -37,11 +38,14 @@ def deranı_from_latin(lt):
     (f"(?<![{L}])({DET})([^{L}]+|$)", r"\1\2"),
     (f"([^])({FTW})?", add_t1_cartouche),
     # ↑ Adding empty cartouches and falling-tone word cartouches.
-    (f"(?<![{L}])(mı́|shú)([^{L}]+)([^{L}]*(?!({TLP})([^{L}]|$)){FTW})(?![{L}])",
+    (f"(?<![{L}])(mı́|shú)([^{L}]+)((?!({TLP})([^{L}]|$)){FTW})(?![{L}])",
      r"󱛘\1\2󱛓\3󱛓󱛙"),
-    (f"(?<![{L}])(mı|shu)([{T}]?[^{L}]+)([^{L}]*(?!({TLP})([^{L}]|$)){FTW})(?![{L}])",
-     r"\1\2󱛓\3󱛓"),
+    (f"(?<![{L}])(mı|shu)([{T34}]?)([^{L}{T}]+)((?!({TLP})([^{L}]|$)){FTW})"
+     + "(?![{L}])",
+     r"\1\2\3󱛓\4󱛓"),
     # ↑ Adding cartouches and name marks on MI and SHU phrases.
+    ("(.*)", lambda m: re.sub("\s", " ", m.group(0))),
+    # ↑ Cartouches containing more than one word must use non-breaking spaces.
     (f"(?<![{L}])(mo[{T}]?)([^{L}]+)", r"\1 󱛓\2"),
     (f"([^{L}]+)(teo)(?![{L}])", r"\1󱛓 \2"),
     # ↑ Adding quote marks in MO—TEO quotes.
