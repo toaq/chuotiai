@@ -76,7 +76,7 @@ def deranı_from_latin(lt):
     # ↑ Moving tone marks before the first vowel.
     (f"([{V}])m", r"\1󱚱"),
     # ↑ Mapping coda ⟪m⟫ to the dedicated Deranı glyph.
-    (f"[.…?!‹›{PU1}]", "")
+    (f"[:;,.…?!‹›{PU1}]", "")
     # ↑ Removing needless Latin punctuation.
   )
   # ==== #
@@ -187,7 +187,7 @@ deranı_from_latin.monograph_map = {
   "-": "󱛒",
 #  "̣": "󱛒",
   ":": "󱛓",
-  ",": " 󱛔",
+#  ",": " 󱛔",
 #  "[": "󱛘",
 #  "]": "󱛙",
 #  ".": " 󱛕",
