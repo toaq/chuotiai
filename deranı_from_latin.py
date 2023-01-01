@@ -49,7 +49,7 @@ def deranı_from_latin(lt):
     # ↑ Adding cartouches and name marks on MI and SHU phrases.
     (SSA+"(.*)"+ESA, lambda m: re.sub("\s", " ", m.group(0))),
     # ↑ Cartouches containing more than one word must use non-breaking spaces.
-    (f"(?<![{L}])(mo[{T}]?)([^{L}]+)", r"\1 󱛓\2"),
+    (f"(?<![{L}])(mo[{T}]?)([^{L}{T}]+)", r"\1 󱛓\2"),
     (f"([^{L}]+)(teo)(?![{L}])", r"\1󱛓 \2"),
     # ↑ Adding quote marks in MO—TEO quotes.
     (f"{PU1}([{L}]+)", r"󱛓\1󱛓"),
@@ -63,12 +63,12 @@ def deranı_from_latin(lt):
     (f"(?<=[{L}{T}])(󱛓?󱛙?(\s󱛚)?)([^,{L}{T}]+)(e|na|ꝡe)([{T}])(?![{L}])",
      r"\1 󱛔\3\4\5"),
     # ↑ Adding ⟪󱛔⟫ in places where commas are not used in the Latin script.
-    (f" (da)(?![{L}])", r" \1 󱛕"),
-    (f"(?<=[{L}])(?<!mo)(?<!m[{T}]o)([󱛓󱛙]*)([^{L}]*)(({MS})(?![{L}{T}])|$)",
+    (f" (da)(?![{L}{T}])", r" \1 󱛕"),
+    (f"(?<=[{L}])(?<!mo)(?<!m[{T}]o)([󱛓󱛙]*)([^{L}{T}]*)(({MS})(?![{L}{T}])|$)",
      r"\1 󱛕\2\3"),
     ("󱛕 󱛕", "󱛕"),
     # ↑ Adding assertive sentence end marks.
-    (f" (ka|ba|nha|doa|ꝡo|dâ|môq)( 󱛕)?(?![{L}{T}])", r" \1 󱛖"),
+    (f" (ka|ba|nha|doa|ꝡo|dâ|môq)( 󱛕)?(?![{L}{T}])", r" \1 󱛖"),
     # ↑ Adding non-assertive non-interrogative sentence end marks.
     (f" (móq)( 󱛕)?(?![{L}])", r" \1 󱛗"),
     # ↑ Adding interrogative sentence end marks.
