@@ -60,10 +60,12 @@ def deranı_from_latin(lt):
     # ↑ Adding prefix-root delineators ⟪󱛒⟫.
     (f"(?!({D}))([{V}])([{V}])", r"\2" + DHM + r"\3"),
     # ↑ Adding hiatus marks to non-diphthong vowel sequences.
-    (f"(?<=[{L}{T}])(󱛓?)([^,{L}{T}]+)(e|na|ꝡe)([{T}])(?![{L}])", r"\1 󱛔\2\3\4"),
+    (f"(?<=[{L}{T}])(󱛓?󱛙?(\s󱛚)?)([^,{L}{T}]+)(e|na|ꝡe)([{T}])(?![{L}])",
+     r"\1 󱛔\3\4\5"),
     # ↑ Adding ⟪󱛔⟫ in places where commas are not used in the Latin script.
     (f" (da)(?![{L}])", r" \1 󱛕"),
-    (f"(?<=[{L}])(?<!mo)(?<!m[{T}]o)([󱛓󱛙]*)([^{L}]*)(({MS})(?![{L}{T}])|$)", r"\1 󱛕\2\3"),
+    (f"(?<=[{L}])(?<!mo)(?<!m[{T}]o)([󱛓󱛙]*)([^{L}]*)(({MS})(?![{L}{T}])|$)",
+     r"\1 󱛕\2\3"),
     ("󱛕 󱛕", "󱛕"),
     # ↑ Adding assertive sentence end marks.
     (f" (ka|ba|nha|doa|ꝡo|dâ|môq)(?![{L}{T}])", r" \1 󱛖"),
