@@ -68,9 +68,9 @@ def deranı_from_latin(lt):
      r"\1 󱛕\2\3"),
     ("󱛕 󱛕", "󱛕"),
     # ↑ Adding assertive sentence end marks.
-    (f" (ka|ba|nha|doa|ꝡo|dâ|môq)(?![{L}{T}])", r" \1 󱛖"),
+    (f" (ka|ba|nha|doa|ꝡo|dâ|môq)( 󱛕)?(?![{L}{T}])", r" \1 󱛖"),
     # ↑ Adding non-assertive non-interrogative sentence end marks.
-    (f" (móq)(?![{L}])", r" \1 󱛗"),
+    (f" (móq)( 󱛕)?(?![{L}])", r" \1 󱛗"),
     # ↑ Adding interrogative sentence end marks.
     (f"([{V}])([{T}])", r"\2\1"),
     # ↑ Moving tone marks before the first vowel.
