@@ -101,6 +101,7 @@ def lemma_of(s):
   return diacriticless_normalized(s)
 
 def normalized(s):
+  # TODO: Test again on example sentences. Check if the ⟦re⟧ module works instead of ⟦regex⟧.
   assert isinstance(s, str)
   if s == "":
     return s
