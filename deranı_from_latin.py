@@ -9,7 +9,7 @@ import pytoaq.latin as pytoaq
 # ==================================================================== #
 
 def entrypoint(self_path, latin_toaq, arg2 = None):
-  if arg2 in {"D", "DS"}:
+  if arg2 in {"D", "DS", "C", "CS", "DCS"}:
     cartouche_space = '󱛛' # Deranı compatibility space (U0F16DB).
   else:
     cartouche_space = ' ' # Non-breaking space.
