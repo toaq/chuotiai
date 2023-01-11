@@ -8,12 +8,16 @@ import pytoaq.latin as pytoaq
 
 # ==================================================================== #
 
-def entrypoint(self_path, latin_toaq):
-  assert(isinstance(latin_toaq, str))
-  sys.stdout.write(f"{deranı_from_latin(latin_toaq)}\n")
+def entrypoint(self_path, latin_toaq, arg2 = None):
+  if arg2 in {"D", "DS"}:
+    cartouche_space = '󱛛' # Deranı compatibility space (U0F16DB).
+  else:
+    cartouche_space = ' ' # Non-breaking space.
+  sys.stdout.write(
+    deranı_from_latin(latin_toaq, cartouche_space) + '\n')
   return
 
-def deranı_from_latin(lt):
+def deranı_from_latin(lt, cartouche_space):
   monograph_map = deranı_from_latin.monograph_map
   digraph_map = deranı_from_latin.digraph_map
   C = pytoaq.std_consonant_str # Toaq Consonant character
@@ -47,8 +51,8 @@ def deranı_from_latin(lt):
      + f"(?![{L}])",
      r"\1\2"+SSA+r"\3"+ESA+r"󱛓\4󱛓"),
     # ↑ Adding cartouches and name marks on MI and SHU phrases.
-    (SSA+"(.*)"+ESA, lambda m: re.sub("\s", "󱛛", m.group(0))),
-    # ↑ Cartouches containing more than one word must use the Deranı non-breaking spaces ⟪󱛛⟫ (U0F16DB).
+    (SSA+"(.*)"+ESA, lambda m: re.sub("\s", cartouche_space, m.group(0))),
+    # ↑ Cartouches containing more than one word must use non-breaking spaces (either a standard non-breaking space or a Deranı compatibility space, as specified by the argument ⟦cartouche_space⟧).
     (f"(?<![{L}])(mo[{T}]?)([^{L}{T}]+)", r"\1 󱛓\2"),
     (f"([^{L}]+)(teo)(?![{L}])", r"\1󱛓 \2"),
     # ↑ Adding quote marks in MO—TEO quotes.
