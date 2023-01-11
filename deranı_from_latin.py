@@ -47,8 +47,8 @@ def deranı_from_latin(lt):
      + f"(?![{L}])",
      r"\1\2"+SSA+r"\3"+ESA+r"󱛓\4󱛓"),
     # ↑ Adding cartouches and name marks on MI and SHU phrases.
-    (SSA+"(.*)"+ESA, lambda m: re.sub("\s", " ", m.group(0))),
-    # ↑ Cartouches containing more than one word must use non-breaking spaces.
+    (SSA+"(.*)"+ESA, lambda m: re.sub("\s", "󱛛", m.group(0))),
+    # ↑ Cartouches containing more than one word must use the Deranı non-breaking spaces ⟪󱛛⟫ (U0F16DB).
     (f"(?<![{L}])(mo[{T}]?)([^{L}{T}]+)", r"\1 󱛓\2"),
     (f"([^{L}]+)(teo)(?![{L}])", r"\1󱛓 \2"),
     # ↑ Adding quote marks in MO—TEO quotes.
