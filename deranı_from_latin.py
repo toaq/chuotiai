@@ -8,16 +8,20 @@ import pytoaq.latin as pytoaq
 
 # ==================================================================== #
 
-def entrypoint(self_path, latin_toaq, arg2 = None):
-  if arg2 in {"D", "DS", "C", "CS", "DCS"}:
+def entrypoint():
+  from argparse import ArgumentParser, BooleanOptionalAction
+  argparser = ArgumentParser()
+  argparser.add_argument('--compatibility-space', action=BooleanOptionalAction)
+  argparser.add_argument('input')
+  args = argparser.parse_args()
+  sys.stdout.write(deranı_from_latin(args.input, vars(args)))
+
+def deranı_from_latin(lt, opts = {}):
+  if opts['compatibility_space']:
     cartouche_space = '󱛛' # Deranı compatibility space (U0F16DB).
   else:
     cartouche_space = ' ' # Non-breaking space.
-  sys.stdout.write(
-    deranı_from_latin(latin_toaq, cartouche_space) + '\n')
-  return
 
-def deranı_from_latin(lt, cartouche_space):
   monograph_map = deranı_from_latin.monograph_map
   digraph_map = deranı_from_latin.digraph_map
   C = pytoaq.std_consonant_str # Toaq Consonant character
@@ -214,4 +218,5 @@ deranı_from_latin.digraph_map = {
 
 # === ENTRY POINT === #
 
-entrypoint(*sys.argv)
+if __name__ == "__main__":
+  entrypoint()
