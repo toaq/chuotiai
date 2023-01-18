@@ -14,14 +14,13 @@ def entrypoint():
   argparser.add_argument('--compatibility-space', action=BooleanOptionalAction)
   argparser.add_argument('input')
   args = argparser.parse_args()
-  sys.stdout.write(deranı_from_latin(args.input, vars(args)))
+  sys.stdout.write(deranı_from_latin(args.input, vars(args)) + '\n')
 
 def deranı_from_latin(lt, opts = {}):
   if opts['compatibility_space']:
     cartouche_space = '󱛛' # Deranı compatibility space (U0F16DB).
   else:
     cartouche_space = ' ' # Non-breaking space.
-
   monograph_map = deranı_from_latin.monograph_map
   digraph_map = deranı_from_latin.digraph_map
   C = pytoaq.std_consonant_str # Toaq Consonant character
