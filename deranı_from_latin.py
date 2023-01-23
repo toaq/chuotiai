@@ -45,7 +45,7 @@ def deranı_from_latin(lt, opts = {}):
     # ↑ Adding glottal stop marks ⟪'⟫ to certain word-initial vowels.
     (f"[{C}]?h?[{V}][{CUD}]?[{CAA}][{CVD}]*", add_t2_cartouche),
     # ↑ Adding cartouches to suitable ⟪◌́ ⟫-toned words.
-    (f"(?<![{L}])({DET})([^{L}]+|$)", f"\\1{SSA}\\2{ESA}"),
+    (f"(?<![{L}])({DET}),?([^{L}]+|$)", f"\\1{SSA}\\2{ESA}"),
     (f"{SSA}([^{ESA}]+){ESA}({FTW})?", add_t1_cartouche),
     # ↑ Adding empty cartouches and falling-tone word cartouches.
     (f"(?<![{L}])(mı́|shú)([^{L}]+)((?!({TLP})([^{L}]|$)){FTW})(?![{L}])",
@@ -67,7 +67,7 @@ def deranı_from_latin(lt, opts = {}):
     # ↑ Adding prefix-root delineators ⟪󱛒⟫.
     (f"(?!({D}))([{V}])([{V}])", r"\2" + DHM + r"\3"),
     # ↑ Adding hiatus marks to non-diphthong vowel sequences.
-    (f"(?<=[{L}{T}])(󱛓?󱛙?(\s󱛚)?)([^,{L}{T}]+)(e|na|ꝡe|ꝡa)([{T}])(?![{L}])",
+    (f"(?<=[{L}{T}])(󱛓?󱛙?(\s󱛚)?)([^,󱛚{L}{T}]+)(e|na|ꝡe|ꝡa)([{T}])(?![{L}])",
      r"\1 󱛔\3\4\5"),
     # ↑ Adding ⟪󱛔⟫ in places where commas are not used in the Latin script.
     (f" (da)(?![{L}{T}])", r" \1 󱛕"),
