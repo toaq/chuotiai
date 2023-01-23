@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: CC0-1.0
 
 import sys, unicodedata, re
-import pytoaq.latin as pytoaq
+import latin
 
 # ==================================================================== #
 
@@ -23,9 +23,9 @@ def deranı_from_latin(lt, opts = {}):
     cartouche_space = ' ' # Non-breaking space.
   monograph_map = deranı_from_latin.monograph_map
   digraph_map = deranı_from_latin.digraph_map
-  C = pytoaq.std_consonant_str # Toaq Consonant character
-  V = pytoaq.std_vowel_str # Toaq Vowel
-  L = pytoaq.std_charset # Toaq Letter
+  C = latin.std_consonant_str # Toaq Consonant character
+  V = latin.std_vowel_str # Toaq Vowel
+  L = latin.std_charset # Toaq Letter
   T = "́̈̂" # Tone marks (◌́, ◌̂, ◌̂)
   T34 = "̈̂" # Tone 3 & 4 (◌̂, ◌̂)
   CAA = "́" # Combining Acute Accent
@@ -34,9 +34,9 @@ def deranı_from_latin(lt, opts = {}):
   D = "aı|ao|eı|oı" # Diphthong
   DHM = "󱛍" # Deranı Hiatus mark
   FTW = f"[{C}]?h?[{V}]{CUD}?(?![{T}])[{C+V+CUD}]*"  # Falling Tone Word
-  DET = normalized_re_from_wordset(pytoaq.determiners)
-  TLP = normalized_re_from_wordset(pytoaq.toneless_particles)
-  MS = normalized_re_from_wordset(pytoaq.matrix_subordinators)
+  DET = normalized_re_from_wordset(latin.determiners)
+  TLP = normalized_re_from_wordset(latin.toneless_particles)
+  MS = normalized_re_from_wordset(latin.matrix_subordinators)
   SSA = "\u0086"  # control character: Start Selected Area
   ESA = "\u0087"  # control character: End Selected Area
   PU1 = "\u0091"  # control character: Private Use #1
@@ -127,12 +127,12 @@ def normalized_re_from_wordset(ws):
 NFD_cartoucheless_words = {
   unicodedata.normalize("NFD", p).replace("i", "ı")
   for p in (
-    pytoaq.pronouns | pytoaq.determiners
-    | pytoaq.functors_with_lexical_tone
+    latin.pronouns | latin.determiners
+    | latin.functors_with_lexical_tone
     | {
-      pytoaq.inflected_from_lemma(l, "´")
+      latin.inflected_from_lemma(l, "´")
       for l in (
-        pytoaq.functors_with_grammatical_tone - pytoaq.predicatizers)
+        latin.functors_with_grammatical_tone - latin.predicatizers)
     }
   )
 }
@@ -153,7 +153,7 @@ def add_t1_cartouche(m):
     α = re.sub("\s", " ", α)  # Replacing spaces with non-breaking spaces.
     if β in ("", None):
       r = α + "󱛚 "
-    elif β in pytoaq.toneless_particles:
+    elif β in latin.toneless_particles:
       r = α + "󱛚 " + β
     else:
       r = f" 󱛘{β}󱛙"
