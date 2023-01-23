@@ -121,6 +121,7 @@ proc deranı_from_latin(
     (fmt"[:;,.…?!‹›{PU1}]", "")
     # ↑ Removing needless Latin punctuation.
   ]
+  # ==== #
   var r = toNfd(lt)
   r = nre.replace(r, re"(*UTF8)(?<![A-Za-zı])([A-Z])", PU1 & "$1")
   var s = fmt(r"(^|([.…?!]|mo[{T}])\s+)")
