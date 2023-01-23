@@ -46,7 +46,7 @@ def deranı_from_latin(lt, opts = {}):
     (f"[{C}]?h?[{V}][{CUD}]?[{CAA}][{CVD}]*", add_t2_cartouche),
     # ↑ Adding cartouches to suitable ⟪◌́ ⟫-toned words.
     (f"(?<![{L}])({DET})([^{L}]+|$)", f"\\1{SSA}\\2{ESA}"),
-    (f"{SSA}([^{ESA}]){ESA}({FTW})?", add_t1_cartouche),
+    (f"{SSA}([^{ESA}]+){ESA}({FTW})?", add_t1_cartouche),
     # ↑ Adding empty cartouches and falling-tone word cartouches.
     (f"(?<![{L}])(mı́|shú)([^{L}]+)((?!({TLP})([^{L}]|$)){FTW})(?![{L}])",
      r"󱛘\1"+SSA+r"\2"+ESA+r"󱛓\3󱛓󱛙"),
