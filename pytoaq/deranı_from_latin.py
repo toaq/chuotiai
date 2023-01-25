@@ -81,7 +81,7 @@ def deranı_from_latin(lt, opts = {}):
     # ↑ Adding interrogative sentence end marks.
     (f"([{V}])([{T}])", r"\2\1"),
     # ↑ Moving tone marks before the first vowel.
-    (f"([{V}])m", r"\1󱚱"),
+    (f"([{V}])m(?![{V}])", r"\1󱚱"),
     # ↑ Mapping coda ⟪m⟫ to the dedicated Deranı glyph.
     (f"[:;,.…?!‹›{PU1}]", "")
     # ↑ Removing needless Latin punctuation.

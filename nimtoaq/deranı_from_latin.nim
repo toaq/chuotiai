@@ -116,7 +116,7 @@ proc deranı_from_latin(
     # ↑ Adding interrogative sentence end marks.
     (fmt"([{V}])([{T}])", "$2$1"),
     # ↑ Moving tone marks before the first vowel.
-    (fmt"([{V}])m", "$1󱚱"),
+    (fmt"([{V}])m(?![{V}])", "$1󱚱"),
     # ↑ Mapping coda ⟪m⟫ to the dedicated Deranı glyph.
     (fmt"[:;,.…?!‹›{PU1}]", "")
     # ↑ Removing needless Latin punctuation.
