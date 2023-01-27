@@ -1,0 +1,7 @@
+
+export EMCC_CFLAGS="-fpic"
+nim c -d:emscripten wasm_test.nim
+python3 -m http.server
+firefox wasm_test.html
+
+
