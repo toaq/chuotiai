@@ -72,10 +72,13 @@ proc deranı_from_latin*(
   let DET: string = normalized_re_from_wordset(latin.determiners)
   let TLP: string = normalized_re_from_wordset(latin.toneless_particles)
   let MS: string = normalized_re_from_wordset(latin.matrix_subordinators)
+  let CONJ: string = normalized_re_from_wordset(latin.conjunctions)
   const SSA = "\u0086"  # control character: Start Selected Area
   const ESA = "\u0087"  # control character: End Selected Area
   const PU1 = "\u0091"  # control character: Private Use #1
   let RRL = @[  # Rewrite Rule List
+    (fmt",(\s*{CONJ}{T}?\s)", r"$1"),
+    # ↑ Removing commas preceding conjunctions: the Deranı ⟪󱛔⟫ doesn't appear in this context.
     (fmt"(^|[^{L}])([{V}][{T}]?(s|f|c|g|b))", "$1'$2"),
     # ↑ Adding glottal stop marks ⟪'⟫ to certain word-initial vowels.
     (fmt"([{C}]?h?[{V}][{CUD}]?[{CAA}][{CVD}]*)", "\eadd_t2_cartouche"),
@@ -118,7 +121,7 @@ proc deranı_from_latin*(
     # ↑ Moving tone marks before the first vowel.
     (fmt"([{V}])m(?![{V}])", "$1󱚱"),
     # ↑ Mapping coda ⟪m⟫ to the dedicated Deranı glyph.
-    (fmt"[:;,.…?!‹›{PU1}]", "")
+    (fmt"[:;.…?!‹›{PU1}]", "")
     # ↑ Removing needless Latin punctuation.
   ]
   # ==== #
@@ -261,12 +264,7 @@ proc monograph_map(): Table[string, string] =
     "-": "󱛒",
   #  "̣": "󱛒",
     ":": "󱛓",
-  #  ",": " 󱛔",
-  #  "[": "󱛘",
-  #  "]": "󱛙",
-  #  ".": " 󱛕",
-  #  ";": " 󱛖",
-  #  "?": " 󱛗"
+    ",": " 󱛔"
   }.toTable
 
 proc digraph_map(): Table[string, string] =

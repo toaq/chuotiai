@@ -37,10 +37,13 @@ def deranı_from_latin(lt, opts = {}):
   DET = normalized_re_from_wordset(latin.determiners)
   TLP = normalized_re_from_wordset(latin.toneless_particles)
   MS = normalized_re_from_wordset(latin.matrix_subordinators)
+  CONJ = normalized_re_from_wordset(latin.conjunctions)
   SSA = "\u0086"  # control character: Start Selected Area
   ESA = "\u0087"  # control character: End Selected Area
   PU1 = "\u0091"  # control character: Private Use #1
   RRL = (  # Rewrite Rule List
+    (f",(\s*{CONJ}{T}?\s)", r"\1"),
+    # ↑ Removing commas preceding conjunctions: the Deranı ⟪󱛔⟫ doesn't appear in this context.
     (f"(^|[^{L}])([{V}][{T}]?(s|f|c|g|b))", r"\1'\2"),
     # ↑ Adding glottal stop marks ⟪'⟫ to certain word-initial vowels.
     (f"[{C}]?h?[{V}][{CUD}]?[{CAA}][{CVD}]*", add_t2_cartouche),
@@ -83,7 +86,7 @@ def deranı_from_latin(lt, opts = {}):
     # ↑ Moving tone marks before the first vowel.
     (f"([{V}])m(?![{V}])", r"\1󱚱"),
     # ↑ Mapping coda ⟪m⟫ to the dedicated Deranı glyph.
-    (f"[:;,.…?!‹›{PU1}]", "")
+    (f"[:;.…?!‹›{PU1}]", "")
     # ↑ Removing needless Latin punctuation.
   )
   # ==== #
@@ -194,12 +197,7 @@ deranı_from_latin.monograph_map = {
   "-": "󱛒",
 #  "̣": "󱛒",
   ":": "󱛓",
-#  ",": " 󱛔",
-#  "[": "󱛘",
-#  "]": "󱛙",
-#  ".": " 󱛕",
-#  ";": " 󱛖",
-#  "?": " 󱛗"
+  ",": " 󱛔"
 }
 
 deranı_from_latin.digraph_map = {
