@@ -5,7 +5,7 @@
 import std/sets
 from std/sequtils import mapIt
 from std/tables import contains
-import std/nre
+import regex
 from std/strutils import contains, find, join
 from std/strformat import fmt
 from std/unicode import
@@ -92,11 +92,10 @@ const interjections* = @&[
 # ==================================================================== #
 
 func is_a_contentive_lemma*(s: string): bool =
-  return isSome(nre.match(s, re(
-    "(*UTF8)" &
+  return regex.match(s, re(
     fmt"([{std_word_initial_str}]h?)?[aeıouạẹı̣ọụ]+[mq]?" &
     fmt"(([{std_consonant_str}]h?)[aeıouạẹı̣ọụ]+[mq]?)*$"
-  )))
+  ))
 
 func is_a_lemma*(s: string): bool =
   return (

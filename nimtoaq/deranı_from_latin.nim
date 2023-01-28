@@ -10,7 +10,7 @@ import sugar
 from os import nil
 from system import quit, io
 import sets, tables
-import nre, strformat, strutils
+import regex, strformat, strutils
 from std/sequtils import toSeq, mapIt, all
 import unicode
 import normalize
@@ -20,12 +20,12 @@ from latin import nil
 # ==================================================================== #
 # PROCS
 
-proc deranı_from_latin(lt: string, opts: seq[string]): string
+proc deranı_from_latin*(lt: string, opts: seq[string]): string
 proc normalized_re_from_wordset(ws: HashSet[string]): string
 proc monograph_map(): Table[string, string]
 proc digraph_map(): Table[string, string]
-proc add_t2_cartouche(m: RegexMatch): string
-proc add_t1_cartouche(m: RegexMatch): string
+proc add_t2_cartouche(m: RegexMatch, s: string): string
+proc add_t1_cartouche(m: RegexMatch, s: string): string
 proc utf8_with_replaced_interval(
   s1: string, i: uint, j: uint, s2: string): string
 proc utf8_slice_of(s: string, i: uint, j: uint): string
@@ -49,7 +49,7 @@ when isMainModule:
 
 # ==================================================================== #
 
-proc deranı_from_latin(
+proc deranı_from_latin*(
   lt: string, opts: seq[string]
 ): string =
   var cartouche_space: string
@@ -78,7 +78,7 @@ proc deranı_from_latin(
   let RRL = @[  # Rewrite Rule List
     (fmt"(^|[^{L}])([{V}][{T}]?(s|f|c|g|b))", "$1'$2"),
     # ↑ Adding glottal stop marks ⟪'⟫ to certain word-initial vowels.
-    (fmt"[{C}]?h?[{V}][{CUD}]?[{CAA}][{CVD}]*", "\eadd_t2_cartouche"),
+    (fmt"([{C}]?h?[{V}][{CUD}]?[{CAA}][{CVD}]*)", "\eadd_t2_cartouche"),
     # ↑ Adding cartouches to suitable ⟪◌́ ⟫-toned words.
     (fmt"(?<![{L}])({DET}),?([^{L}]+|$)", fmt"$1{SSA}$2{ESA}"),
     (fmt"{SSA}([^{ESA}]+){ESA}({FTW})?", "\eadd_t1_cartouche"),
@@ -102,7 +102,7 @@ proc deranı_from_latin(
     # ↑ Adding prefix-root delineators ⟪󱛒⟫.
     (fmt"(?!({D}))([{V}])([{V}])", fmt"$2{DHM}$3"),
     # ↑ Adding hiatus marks to non-diphthong vowel sequences.
-    (fmt"(?<=[{L}{T}])(󱛓?󱛙?([  ]󱛚)?)([^,󱛚{L}{T}]+)(e|na|ꝡe|ꝡa)([{T}])(?![{L}])",
+    (fmt"(?<=[{L}{T}])(󱛓?󱛙?([\s]󱛚)?)([^,󱛚{L}{T}]+)(e|na|ꝡe|ꝡa)([{T}])(?![{L}])",
      "$1 󱛔$3$4$5"),
     # ↑ Adding ⟪󱛔⟫ in places where commas are not used in the Latin script.
     (fmt" (da)(?![{L}{T}])", " $1 󱛕"),
@@ -123,27 +123,26 @@ proc deranı_from_latin(
   ]
   # ==== #
   var r = toNfd(lt)
-  r = nre.replace(r, re"(*UTF8)(?<![A-Za-zı])([A-Z])", PU1 & "$1")
+  r = regex.replace(r, re"(?<![A-Za-zı])([A-Z])", PU1 & "$1")
   var s = fmt(r"(^|([.…?!]|mo[{T}])\s+)")
-  r = nre.replace(r, re("(*UTF8)" & s & PU1), "$1")
+  r = regex.replace(r, re(s & PU1), "$1")
   r = toLower(r)
   r = strutils.replace(r, "i", "ı")
   # Applying the rewrite rules:
   var callback_named = @[
-    ("add_t2_cartouche", (m: RegexMatch) {.closure.} => add_t2_cartouche(m)),
-    ("add_t1_cartouche", (m: RegexMatch) {.closure.} => add_t1_cartouche(m)),
+    ("add_t2_cartouche", (m: RegexMatch, s: string) {.closure.} => add_t2_cartouche(m, s)),
+    ("add_t1_cartouche", (m: RegexMatch, s: string) {.closure.} => add_t1_cartouche(m, s)),
     ("add_deranı_spaces", (
-      ((m: RegexMatch) => nre.replace(
-        m.captures[0], re(r"\s"), cartouche_space))
+      ((m: RegexMatch, s: string) => regex.replace(
+        s[m.captures[0][0]], re(r"\s"), cartouche_space))
     ))].toTable
   proc f(i: int): bool = # Body for the forthcoming loop.
     var rr = RRL[i]
-    rr[0] = "(*UTF8)" & rr[0]
     if rr[1].len > 0 and rr[1][0] == '\e':
       let cb = callback_named[rr[1][1..^1]]
-      r = nre.replace(r, re(rr[0]), cb)
+      r = regex.replace(r, re(rr[0]), cb)
     else:
-      r = nre.replace(r, re(rr[0]), rr[1])
+      r = regex.replace(r, re(rr[0]), rr[1])
     return true
   traverse_while((i: int) => (i < RRL.len), f)
   proc g(i: int): bool = # Body for the forthcoming loop.
@@ -199,25 +198,25 @@ proc NFD_cartoucheless_words(): HashSet[string] =
     )
   )
 
-proc add_t2_cartouche(m: RegexMatch): string =
-  var w = m.captures[-1]
+proc add_t2_cartouche(m: RegexMatch, s: string): string =
+  var w = s[m.captures[0][0]]
   if not NFD_cartoucheless_words().contains(w):
     if all(@["hụ́", "hụ́"], (s: string) => not contains(w, s)):
       w = "󱛘" & w & "󱛙"
   return w
 
-proc add_t1_cartouche(m: RegexMatch): string =
-  var α = m.captures[0]
+proc add_t1_cartouche(m: RegexMatch, s: string): string =
+  var α = s[m.captures[0][0]]
   var β: string
-  if 1 in m.captureBounds:
-    β = m.captures[1]
+  if m.captures.len >= 1 and m.captures[1].len >= 1:
+    β = s[m.captures[1][0]]
   else:
     β = ""
   var r: string
   if α == "":
     r = " 󱛚"
   else:
-    α = nre.replace(α, re(r"(*UTF8)\s"), " ")
+    α = regex.replace(α, re(r"\s"), " ")
     # ↑ Replacing spaces with non-breaking spaces.
     if β == "":
       r = α & "󱛚 "
