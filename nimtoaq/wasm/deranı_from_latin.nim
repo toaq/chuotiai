@@ -208,7 +208,7 @@ proc add_t2_cartouche(m: RegexMatch, s: string): string =
 proc add_t1_cartouche(m: RegexMatch, s: string): string =
   var α = s[m.captures[0][0]]
   var β: string
-  if m.captures.len >= 1:
+  if m.captures.len >= 1 and m.captures[1].len >= 1:
     β = s[m.captures[1][0]]
   else:
     β = ""
