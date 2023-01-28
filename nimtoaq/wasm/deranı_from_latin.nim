@@ -102,7 +102,7 @@ proc deranı_from_latin*(
     # ↑ Adding prefix-root delineators ⟪󱛒⟫.
     (fmt"(?!({D}))([{V}])([{V}])", fmt"$2{DHM}$3"),
     # ↑ Adding hiatus marks to non-diphthong vowel sequences.
-    (fmt"(?<=[{L}{T}])(󱛓?󱛙?([  ]󱛚)?)([^,󱛚{L}{T}]+)(e|na|ꝡe|ꝡa)([{T}])(?![{L}])",
+    (fmt"(?<=[{L}{T}])(󱛓?󱛙?([\s]󱛚)?)([^,󱛚{L}{T}]+)(e|na|ꝡe|ꝡa)([{T}])(?![{L}])",
      "$1 󱛔$3$4$5"),
     # ↑ Adding ⟪󱛔⟫ in places where commas are not used in the Latin script.
     (fmt" (da)(?![{L}{T}])", " $1 󱛕"),
