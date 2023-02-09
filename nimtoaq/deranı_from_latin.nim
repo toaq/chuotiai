@@ -72,7 +72,7 @@ proc deranı_from_latin*(
   # ↑ Falling Tone Word
   let DET: string = normalized_re_from_wordset(latin.determiners)
   let TLP: string = normalized_re_from_wordset(latin.toneless_particles)
-  let MS: string = normalized_re_from_wordset(latin.matrix_subordinators)
+  let MS: string = normalized_re_from_wordset(latin.root_subordinators)
   let CONJ: string = normalized_re_from_wordset(latin.conjunctions)
   const SSA = "\u0086"  # control character: Start Selected Area
   const ESA = "\u0087"  # control character: End Selected Area

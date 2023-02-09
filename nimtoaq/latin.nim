@@ -40,7 +40,7 @@ const std_consonants* = std_initials & @["q"]
 
 # ==================================================================== #
 
-const matrix_subordinators* = @&["ꝡa", "ma", "tıo"]
+const root_subordinators* = @&["ꝡa", "ma", "tıo"]
 const nominal_subordinators* =
    @&["ꝡä", "mä", "tïo", "lä", "ꝡé", "ná", "é"]
 const adnominal_subordinators* = @&["ꝡë", "ë", "jü"]
@@ -60,7 +60,7 @@ const illocutions* = (
   falling_tone_illocutions + raising_tone_illocutions +
   peaking_tone_illocutions)
 const focus_markers* = @&["kú", "tóu", "béı"]
-const preverbals* = @&["bï", "nä"]
+const clefts* = @&["bï", "nä", "gö"]
 const vocative* = @&["hóı"]
 const terminators* = @&["teo", "kı"]
 const exophoric_pronouns* = @&[
@@ -74,16 +74,16 @@ const functors_with_grammatical_tone* =
   predicatizers + @&["mı", "shu", "mo"]
 
 const functors_with_lexical_tone* = (
-  matrix_subordinators + nominal_subordinators +
+  root_subordinators + nominal_subordinators +
   adnominal_subordinators + determiners + conjunctions + illocutions +
-  focus_markers + preverbals + vocative + terminators + @&["gö", "kïo"]
+  focus_markers + clefts + vocative + terminators + @&["kïo"]
 )
 
 const functor_lemmas* = (
   functors_with_grammatical_tone + functors_with_lexical_tone)
 
 const toneless_particles* = (
-  matrix_subordinators + falling_tone_illocutions + terminators)
+  root_subordinators + falling_tone_illocutions + terminators)
 
 const interjections* = @&[
   "m̄", "ḿ", "m̈", "m̉", "m̂", "m̀", "m̃"

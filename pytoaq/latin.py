@@ -29,7 +29,7 @@ std_consonants = std_initials + ("q",)
 
 # ==================================================================== #
 
-matrix_subordinators = {"ꝡa", "ma", "tıo"}
+root_subordinators = {"ꝡa", "ma", "tıo"}
 nominal_subordinators = {"ꝡä", "mä", "tïo", "lä", "ꝡé", "ná", "é"}
 adnominal_subordinators = {"ꝡë", "ë", "jü"}
 predicatizers = {"jeı", "mea", "po"}
@@ -46,7 +46,7 @@ illocutions = (
   falling_tone_illocutions | raising_tone_illocutions
   | peaking_tone_illocutions)
 focus_markers = {"kú", "tóu", "béı"}
-preverbals = {"bï", "nä"}
+clefts = {"bï", "nä", "gö"}
 vocative = {"hóı"}
 terminators = {"teo", "kı"}
 exophoric_pronouns = {
@@ -58,15 +58,15 @@ pronouns = exophoric_pronouns | endophoric_pronouns
 functors_with_grammatical_tone = predicatizers | {"mı", "shu", "mo"}
 
 functors_with_lexical_tone = (
-  matrix_subordinators | nominal_subordinators | adnominal_subordinators
+  root_subordinators | nominal_subordinators | adnominal_subordinators
   | determiners | conjunctions | illocutions | focus_markers
-  | preverbals | vocative | terminators | {"gö", "kïo"})
+  | clefts | vocative | terminators | {"kïo"})
 
 functor_lemmas = (
   functors_with_grammatical_tone | functors_with_lexical_tone)
 
 toneless_particles = (
-  matrix_subordinators | falling_tone_illocutions | terminators)
+  root_subordinators | falling_tone_illocutions | terminators)
 
 interjections = {
   'm̄', 'ḿ', 'm̈', 'm̉', 'm̂', 'm̀', 'm̃'
