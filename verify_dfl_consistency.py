@@ -39,6 +39,7 @@ def proceed():
     po = (run(f'python3 {SELF_PATH}/pytoaq/deranı_from_latin.py "{s}"')
           .replace("\n", "␤"))
     t2 = time.time()
+    #no = (run(f'node {SELF_PATH}/nimtoaq/deranı_from_latin.js "{s}"')
     no = (run(f'{SELF_PATH}/nimtoaq/deranı_from_latin "{s}"')
           .replace("\n", "␤"))
     t3 = time.time()

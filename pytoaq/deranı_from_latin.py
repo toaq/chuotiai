@@ -44,7 +44,7 @@ def deranı_from_latin(lt, opts = {}):
   RRL = (  # Rewrite Rule List
     (f",(\s*{CONJ}{T}?\s)", r"\1"),
     # ↑ Removing commas preceding conjunctions: the Deranı ⟪󱛔⟫ doesn't appear in this context.
-    (f"(^|[^{L}])([{V}][{T}]?(s|f|c|g|b))", r"\1'\2"),
+    (f"(^|[^{L}{T}])([{V}][{T}]?(s|f|c|g|b))", r"\1'\2"),
     # ↑ Adding glottal stop marks ⟪'⟫ to certain word-initial vowels.
     (f"[{C}]?h?[{V}][{CUD}]?[{CAA}][{CVD}]*", add_t2_cartouche),
     # ↑ Adding cartouches to suitable ⟪◌́ ⟫-toned words.

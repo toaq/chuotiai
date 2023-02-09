@@ -44,14 +44,15 @@ when isMainModule:
   assert(args.len >= 1)
   let opts: seq[string] = args[1..^1]
   var s = deranı_from_latin(args[0], opts)
-  write(stdout, s & "\n")
+  #write(stdout, s & "\n")
+  echo s
   quit()
 
 # ==================================================================== #
 
 proc deranı_from_latin*(
   lt: string, opts: seq[string]
-): string =
+): string {.exportc.} =
   var cartouche_space: string
   if opts.find("compatibility_space") != -1:
     cartouche_space = "󱛛" # Deranı compatibility space (U0F16DB).
@@ -79,7 +80,7 @@ proc deranı_from_latin*(
   let RRL = @[  # Rewrite Rule List
     (fmt",(\s*{CONJ}{T}?\s)", r"$1"),
     # ↑ Removing commas preceding conjunctions: the Deranı ⟪󱛔⟫ doesn't appear in this context.
-    (fmt"(^|[^{L}])([{V}][{T}]?(s|f|c|g|b))", "$1'$2"),
+    (fmt"(^|[^{L}{T}])([{V}][{T}]?(s|f|c|g|b))", "$1'$2"),
     # ↑ Adding glottal stop marks ⟪'⟫ to certain word-initial vowels.
     (fmt"([{C}]?h?[{V}][{CUD}]?[{CAA}][{CVD}]*)", "\eadd_t2_cartouche"),
     # ↑ Adding cartouches to suitable ⟪◌́ ⟫-toned words.
