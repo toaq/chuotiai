@@ -1,4 +1,4 @@
 #!/bin/bash
-nim js -d:nodejs -d:release deranı_from_latin.nim
+nim js -d:nodejs -d:release --opt:speed deranı_from_latin.nim
 
 

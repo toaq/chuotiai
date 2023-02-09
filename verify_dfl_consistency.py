@@ -32,24 +32,31 @@ def run(cmd):
      .stdout.decode('utf-8')
    )
 
+N = 1
+
 def proceed():
+  def f(s):
+    return s.replace("\n", "␤")
   for s in SENTENCES:
     print(f"◉ ⟪{s}⟫")
     t1 = time.time()
-    po = (run(f'python3 {SELF_PATH}/pytoaq/deranı_from_latin.py "{s}"')
-          .replace("\n", "␤"))
+    for i in range(0, N):
+      po = (run(f'python3 {SELF_PATH}/pytoaq/deranı_from_latin.py "{s}"'))
     t2 = time.time()
-    #no = (run(f'node {SELF_PATH}/nimtoaq/deranı_from_latin.js "{s}"')
-    no = (run(f'{SELF_PATH}/nimtoaq/deranı_from_latin "{s}"')
-          .replace("\n", "␤"))
+    for i in range(0, N):
+      jo = (run(f'node {SELF_PATH}/nimtoaq/deranı_from_latin.js "{s}"'))
     t3 = time.time()
-    if po == no:
-      print(f"→ ⟪{po}⟫")
+    for i in range(0, N):
+      no = (run(f'{SELF_PATH}/nimtoaq/deranı_from_latin "{s}"'))
+    t4 = time.time()
+    if po == no and po == jo:
+      print(f"→ ⟪{f(po)}⟫")
     else:
-      print(f"P ⟪{po}⟫")
-      print(f"N ⟪{no}⟫")
-    print("⧖ Py:  {:.6f}s | Nim: {:.6f}s".format(
-      t2 - t1, t3 - t2))
+      print(f"P ⟪{f(po)}⟫")
+      print(f"J ⟪{f(jo)}⟫")
+      print(f"N ⟪{f(no)}⟫")
+    print("⧖ Py:  {:.6f}s | JS-Nim: {:.6f}s | Nim: {:.6f}s".format(
+      (t2 - t1) / N, (t3 - t2) / N, (t4 - t3) / N))
     print("—-—-—-—")
   return
 
