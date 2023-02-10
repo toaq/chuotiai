@@ -1,4 +1,4 @@
-﻿# NIM ≥1.6
+# NIM ≥1.6
 
 # COPYRIGHT LICENSE: CC0 version 1.0. For reading a copy of this license, please see the text file ⟪LICENSE⟫ in the top level directory.
 # SPDX-License-Identifier: CC0-1.0
@@ -11,7 +11,7 @@ from os import nil
 from system import quit, io
 import sets, tables
 import regex, strformat, strutils
-from std/sequtils import toSeq, mapIt, all
+from std/sequtils import toSeq, map, mapIt, all
 import unicode
 import normalize
 
@@ -21,11 +21,11 @@ from latin import nil
 # PROCS
 
 proc deranı_from_latin*(lt: string, opts: seq[string]): string
-proc normalized_re_from_wordset(ws: HashSet[string]): string
-proc monograph_map(): Table[string, string]
-proc digraph_map(): Table[string, string]
-proc add_t2_cartouche(m: RegexMatch, s: string): string
-proc add_t1_cartouche(m: RegexMatch, s: string): string
+func normalized_re_from_wordset(ws: HashSet[string]): string {.compileTime.}
+func monograph_map(): Table[string, string]
+func digraph_map(): Table[string, string]
+func add_t2_cartouche(m: RegexMatch, s: string): string
+func add_t1_cartouche(m: RegexMatch, s: string): string
 proc utf8_with_replaced_interval(
   s1: string, i: uint, j: uint, s2: string): string
 proc utf8_slice_of(s: string, i: uint, j: uint): string
@@ -50,14 +50,15 @@ when isMainModule:
 
 # ==================================================================== #
 
+func normalized_re_from_wordset(ws: HashSet[string]): string {.compileTime.} =
+  return strutils.replace(toNfd(toSeq(ws).join(sep = "|")), "i", "ı")
+
+const SPACE_RE = re(r"\s")
+
 proc deranı_from_latin*(
   lt: string, opts: seq[string]
 ): string {.exportc.} =
-  var cartouche_space: string
-  if opts.find("compatibility_space") != -1:
-    cartouche_space = "󱛛" # Deranı compatibility space (U0F16DB).
-  else:
-    cartouche_space = " " # Non-breaking space.
+  const DCS = "󱛛" # Deranı Compatibility Space (U0F16DB).
   const C = latin.std_consonant_str # Toaq Consonant character
   const V = latin.std_vowel_str # Toaq Vowel
   const L = latin.std_charset # Toaq Letter
@@ -70,14 +71,14 @@ proc deranı_from_latin*(
   const DHM = "󱛍" # Deranı Hiatus mark
   const FTW = fmt"[{C}]?h?[{V}]{CUD}?(?![{T}])[{C & V & CUD}]*"
   # ↑ Falling Tone Word
-  let DET: string = normalized_re_from_wordset(latin.determiners)
-  let TLP: string = normalized_re_from_wordset(latin.toneless_particles)
-  let MS: string = normalized_re_from_wordset(latin.root_subordinators)
-  let CONJ: string = normalized_re_from_wordset(latin.conjunctions)
+  const DET: string = normalized_re_from_wordset(latin.determiners)
+  const TLP: string = normalized_re_from_wordset(latin.toneless_particles)
+  const MS: string = normalized_re_from_wordset(latin.root_subordinators)
+  const CONJ: string = normalized_re_from_wordset(latin.conjunctions)
   const SSA = "\u0086"  # control character: Start Selected Area
   const ESA = "\u0087"  # control character: End Selected Area
   const PU1 = "\u0091"  # control character: Private Use #1
-  let RRL = @[  # Rewrite Rule List
+  const RRL = @[  # Rewrite Rule List
     (fmt",(\s*{CONJ}{T}?\s)", r"$1"),
     # ↑ Removing commas preceding conjunctions: the Deranı ⟪󱛔⟫ doesn't appear in this context.
     (fmt"(^|[^{L}{T}])([{V}][{T}]?(s|f|c|g|b))", "$1'$2"),
@@ -124,12 +125,15 @@ proc deranı_from_latin*(
     # ↑ Mapping coda ⟪m⟫ to the dedicated Deranı glyph.
     (fmt"[:;.…?!‹›{PU1}]", "")
     # ↑ Removing needless Latin punctuation.
-  ]
+  ].map(pair => (re(pair[0]), pair[1]))
   # ==== #
   var r = toNfd(lt)
-  r = regex.replace(r, re"(?<![A-Za-zı])([A-Z])", PU1 & "$1")
-  var s = fmt(r"(^|([.…?!]|mo[{T}])\s+)")
-  r = regex.replace(r, re(s & PU1), "$1")
+  const pattern_1 = re"(?<![A-Za-zı])([A-Z])"
+  r = regex.replace(r, pattern_1, PU1 & "$1")
+  const pattern_2_s = fmt(r"(^|([.…?!]|mo[{T}])\s+){PU1}")
+  # ↑ This seemingly useless intermediate variable allows circumventing a bug with Nim's compiler v1.6.10.
+  const pattern_2 = re(pattern_2_s)
+  r = regex.replace(r, pattern_2, "$1")
   r = toLower(r)
   r = strutils.replace(r, "i", "ı")
   # Applying the rewrite rules:
@@ -137,30 +141,32 @@ proc deranı_from_latin*(
     ("add_t2_cartouche", (m: RegexMatch, s: string) {.closure.} => add_t2_cartouche(m, s)),
     ("add_t1_cartouche", (m: RegexMatch, s: string) {.closure.} => add_t1_cartouche(m, s)),
     ("add_deranı_spaces", (
-      ((m: RegexMatch, s: string) => regex.replace(
-        s[m.captures[0][0]], re(r"\s"), cartouche_space))
+      ((m: RegexMatch, s: string) {.closure.} => regex.replace(
+        s[m.captures[0][0]], SPACE_RE, DCS))
     ))].toTable
   proc f(i: int): bool = # Body for the forthcoming loop.
     var rr = RRL[i]
     if rr[1].len > 0 and rr[1][0] == '\e':
       let cb = callback_named[rr[1][1..^1]]
-      r = regex.replace(r, re(rr[0]), cb)
+      r = regex.replace(r, rr[0], cb)
     else:
-      r = regex.replace(r, re(rr[0]), rr[1])
+      r = regex.replace(r, rr[0], rr[1])
     return true
   traverse_while((i: int) => (i < RRL.len), f)
   proc g(i: int): bool = # Body for the forthcoming loop.
     # Mapping digraphs and monographs to Deranı glyphs:
     for (m, l) in @[(digraph_map(), 2), (monograph_map(), 1)]:
-      var rl = cast[uint](min(l, runeLen(r) - i))
-      let ui = cast[uint](i)
+      var rl = min(l, runeLen(r) - i).uint
+      let ui = i.uint
       var s = utf8_slice_of(r, ui, ui + rl)
       if m.hasKey(s):
         let v = m[s]
         r = utf8_with_replaced_interval(
-          r, ui, ui + cast[uint](runeLen(s)), v)
+          r, ui, ui + runeLen(s).uint, v)
     return true
   traverse_while((i: int) => (i < runeLen(r)), g)
+  if opts.find("compatibility_space") == -1:
+    r = r.replace(DCS, " ") # Non-breaking space.
   return r
 
 # ==================================================================== #
@@ -185,12 +191,9 @@ proc utf8_with_replaced_interval(
 ): string =
   assert(i < j)
   return utf8_slice_of(s1, 0, i) &
-    s2 & utf8_slice_of(s1, j, cast[uint](runeLen(s1)))
+    s2 & utf8_slice_of(s1, j, runeLen(s1).uint)
 
-proc normalized_re_from_wordset(ws: HashSet[string]): string =
-  return strutils.replace(toNfd(toSeq(ws).join(sep = "|")), "i", "ı")
-
-proc NFD_cartoucheless_words(): HashSet[string] =
+func NFD_cartoucheless_words(): HashSet[string] =
   return toHashSet(
     (
       latin.pronouns + latin.determiners +
@@ -202,14 +205,14 @@ proc NFD_cartoucheless_words(): HashSet[string] =
     )
   )
 
-proc add_t2_cartouche(m: RegexMatch, s: string): string =
+func add_t2_cartouche(m: RegexMatch, s: string): string =
   var w = s[m.captures[0][0]]
   if not NFD_cartoucheless_words().contains(w):
     if all(@["hụ́", "hụ́"], (s: string) => not contains(w, s)):
       w = "󱛘" & w & "󱛙"
   return w
 
-proc add_t1_cartouche(m: RegexMatch, s: string): string =
+func add_t1_cartouche(m: RegexMatch, s: string): string =
   var α = s[m.captures[0][0]]
   var β: string
   if m.captures.len >= 1 and m.captures[1].len >= 1:
@@ -220,7 +223,7 @@ proc add_t1_cartouche(m: RegexMatch, s: string): string =
   if α == "":
     r = " 󱛚"
   else:
-    α = regex.replace(α, re(r"\s"), " ")
+    α = regex.replace(α, SPACE_RE, " ")
     # ↑ Replacing spaces with non-breaking spaces.
     if β == "":
       r = α & "󱛚 "
@@ -232,8 +235,8 @@ proc add_t1_cartouche(m: RegexMatch, s: string): string =
 
 # ==================================================================== #
 
-proc monograph_map(): Table[string, string] =
-  return {
+func monograph_map(): Table[string, string] =
+  const r = {
     "m": "󱚰",
     "b": "󱚲",
     "u": "󱚲",
@@ -267,9 +270,10 @@ proc monograph_map(): Table[string, string] =
     ":": "󱛓",
     ",": " 󱛔"
   }.toTable
+  return r
 
-proc digraph_map(): Table[string, string] =
-  return {
+func digraph_map(): Table[string, string] =
+  const r = {
     "nh": "󱚽",
     "ch": "󱚿",
     "sh": "󱛀",
@@ -279,6 +283,7 @@ proc digraph_map(): Table[string, string] =
     "eı": "󱚴󱛎󱚹",
     "[]": "󱛚"
   }.toTable
+  return r
 
 # ==================================================================== #
 

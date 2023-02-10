@@ -162,7 +162,7 @@ func first_rune(
 
 func with_replaced_interval[T](s1: T, i: int, j: int, s2: T): T =
   assert(i < j)
-  return s1[ 0..< i] & s2 & s1[j .. ^1]
+  return s1[0 ..< i] & s2 & s1[j .. ^1]
 
 func utf8_with_replaced_characters[T: seq[Rune] or string](
   str: T,
