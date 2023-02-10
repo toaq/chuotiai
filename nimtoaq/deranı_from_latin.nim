@@ -39,7 +39,7 @@ proc traverse_while(
 # ==================================================================== #
 # MAIN
 
-when isMainModule:
+when isMainModule and not (defined(js) and not defined(nodejs)):
   let args = os.commandLineParams()
   assert(args.len >= 1)
   let opts: seq[string] = args[1..^1]
