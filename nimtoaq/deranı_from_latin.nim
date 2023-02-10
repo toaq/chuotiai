@@ -302,7 +302,7 @@ iterator utf8_iter(s: string): string =
         ValueError, fmt"Invalid UTF8 byte sequence: ⟪{r.toHex()}⟫")
     
 proc utf8_slice_of(s: string, i: uint, j: uint): string =
-  let l = cast[uint](runeLen(s))
+  let l = runeLen(s).uint
   assert(i <= l)
   assert(j <= l)
   assert(i <= j)
