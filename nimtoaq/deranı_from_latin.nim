@@ -120,7 +120,7 @@ proc deranı_from_latin(
     # ↑ Adding assertive sentence end marks.
     (fmt" (ka|ba|nha|doa|ꝡo|dâ|môq)( 󱛕)?(?![{L}{T}])", " $1 󱛖"),
     # ↑ Adding non-assertive non-interrogative sentence end marks.
-    (fmt" (móq)( 󱛕)?(?![{L}])", " $1 󱛗"),
+    (fmt"(^|\s)(móq)( 󱛕)?(?![{L}])", " $2 󱛗"),
     # ↑ Adding interrogative sentence end marks.
     (fmt"([{V}])([{T}])", "$2$1"),
     # ↑ Moving tone marks before the first vowel.
