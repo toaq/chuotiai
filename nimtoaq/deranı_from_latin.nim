@@ -20,7 +20,7 @@ from latin import nil
 # ==================================================================== #
 # PROCS
 
-proc deranı_from_latin*(lt: string, opts: seq[string]): string
+proc deranı_from_latin(lt: string, opts: seq[string]): string
 func normalized_re_from_wordset(ws: HashSet[string]): string {.compileTime.}
 func monograph_map(): Table[string, string]
 func digraph_map(): Table[string, string]
@@ -53,9 +53,12 @@ when isMainModule and not (defined(js) and not defined(nodejs)):
 func normalized_re_from_wordset(ws: HashSet[string]): string {.compileTime.} =
   return strutils.replace(toNfd(toSeq(ws).join(sep = "|")), "i", "ı")
 
+proc deranı_from_latin_cs(lt: cstring, opts: seq[string]): cstring {.exportc.} =
+  return deranı_from_latin($lt, opts).cstring
+  
 const SPACE_RE = re(r"\s")
 
-proc deranı_from_latin*(
+proc deranı_from_latin(
   lt: string, opts: seq[string]
 ): string {.exportc.} =
   const DCS = "󱛛" # Deranı Compatibility Space (U0F16DB).
