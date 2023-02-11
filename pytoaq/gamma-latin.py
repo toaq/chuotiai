@@ -4,7 +4,7 @@
 
 # ==================================================================== #
 
-import regex as re, unicodedata
+import re, unicodedata
 
 # ==================================================================== #
 
@@ -102,7 +102,7 @@ def normalized(s):
   s = with_carons_replaced_with_diareses(s)
   s = _with_replaced_characters(s, "āēīōūȳ", "aeıouy")
   if None == re.search(
-    "[\sáéíóúýäëïöüÿảẻỉỏủỷâêîôûŷàèìòùỳãẽĩõũỹ]", s, re.IGNORECASE
+    "[\s'áéíóúýäëïöüÿảẻỉỏủỷâêîôûŷàèìòùỳãẽĩõũỹ]", s, re.IGNORECASE
   ):
     # The input is a lemma.
     s = s[0] + s[1:].lower()
@@ -111,8 +111,11 @@ def normalized(s):
     # The input is a normal Toaq text or fragment (not a lemma form).
     s = re.sub("[\t ]+", " ", s)
     # Currently incorrect capitalization is not corrected.
-    p = ( "\\b" )
-    l = re.split(p, s)
+    chs = charset + charset.upper()
+    p = ( f"([^{chs}]*)([{chs}]*)" )
+    PU1 = "\u0091"
+    s = re.sub(p, f"\\1{PU1}\\2{PU1}", s)
+    l = re.split(PU1, s)
     def f(w):
       p = "^(?:[" + std_initial_str + "]h?)?([" + std_vowel_str + "])"
       r = re.findall(p, w, re.IGNORECASE)
@@ -122,15 +125,14 @@ def normalized(s):
           w,
           "áéíóúýäëïöüÿảẻỉỏủỷâêîôûŷàèìòùỳãẽĩõũỹ",
           "aeıouyaeıouyaeıouyaeıouyaeıouyaeıouy")
-        if bare in toneless_particles:
+        if bare.lower() in toneless_particles:
           return bare
-        elif bare in functors_with_grammatical_tone:
-          pass
-        v = w[main_vowel_pos]
-        if v in "aeıouy":
-          # Sparse writing: the default falling tone mark is restored.
-          v = _with_replaced_characters(v, "aeıouy", "ảẻỉỏủỷ")
-        w = bare[:main_vowel_pos] + v + bare[main_vowel_pos + 1:]
+        else: # bare in functors_with_grammatical_tone:
+          v = w[main_vowel_pos]
+          if v in "aeıouy":
+            # Sparse writing: the default falling tone mark is restored.
+            v = _with_replaced_characters(v, "aeıouy", "ảẻỉỏủỷ")
+          w = bare[:main_vowel_pos] + v + bare[main_vowel_pos + 1:]
       return w
     i = 1
     while i < len(l):
