@@ -15,7 +15,7 @@
                 .toLowerCase()
                 .replace(/i/g, 'ı')
                 .replace(/[\u0300-\u030f]/g, '')
-                .replace(/[^0-9A-Za-zı'_\-]+/g, ' ')
+                .replace(/[^0-9A-ZꝠa-zıꝡ'\u0323_\-]+/g, ' ')
                 .replace(/ +/g, ' ')
                 .trim();
     }
