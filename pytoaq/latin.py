@@ -64,7 +64,7 @@ endophoric_pronouns = {
 }
 pronouns = exophoric_pronouns | endophoric_pronouns
 injective_pronouns = {
-   "jî", "sûq", "nhâo", "sûna", "nhâna", "ûmo", "îme", "sûho", "âma", "hâ"
+   "jî", "sûq", "nhâo", "sûna", "nhâna", "ûmo", "îme", "sûho", "âma", "hâ",
    "hôa", "hô", "mâq", "tâ", "hôq", "rôu", "zê", "bôu", "âq", "chêq"
 }
 
