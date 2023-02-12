@@ -25,7 +25,7 @@
       // `dict` is the content of the loaded dictionary JSON.
       var hoetoalai = "'’a-zA-Zıāēīōūȳáéíóúýäëïöüÿǎěǐǒǔảẻỉỏủỷâêîôûŷàèìòùỳãẽĩõũỹ"
                   + "ĀĒĪŌŪȲÁÉÍÓÚÝÄËÏÖÜŸǍĚǏǑǓẢẺỈỎỦỶÂÊÎÔÛŶÀÈÌÒÙỲÃẼĨÕŨỸ"
-                  + "\u0300-\u030f";
+                  + "ạẹịọụẠẸỊỌỤ" + "\u0300-\u030f\u0323";
       var re = new RegExp(
         "<[^>]*>|[" + hoetoalai + "]+|[^<" + hoetoalai + "]", "g");
       // Loading the Toaq text from the elements of class `with_tooltip_definitions`:
