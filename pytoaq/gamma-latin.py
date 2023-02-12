@@ -127,7 +127,7 @@ def normalized(s):
           "aeıouyaeıouyaeıouyaeıouyaeıouyaeıouy")
         if bare.lower() in toneless_particles:
           return bare
-        else: # bare in functors_with_grammatical_tone:
+        else:
           v = w[main_vowel_pos]
           if v in "aeıouy":
             # Sparse writing: the default falling tone mark is restored.

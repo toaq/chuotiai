@@ -32,8 +32,14 @@ std_consonants = std_initials + ("q",)
 root_subordinators = {"ꝡa", "ma", "tıo"}
 nominal_subordinators = {"ꝡä", "mä", "tïo", "lä", "ꝡé", "ná", "é"}
 adnominal_subordinators = {"ꝡë", "ë", "jü"}
+injective_subordinators = {"ꝡâ", "mâ", "tîo", "lâ", "ꝡê", "nâ", "ê"}
 predicatizers = {"jeı", "mea", "po"}
-determiners = {"ló", "ké", "sá", "sía", "tú", "túq", "báq", "já", "hí", "ní", "hú"}
+determiners = {
+  "ló", "ké", "sá", "sía", "tú", "túq", "báq", "já", "hí", "ní", "hú"
+}
+injective_determiners = {
+  "lô", "kê", "sâ", "sîa", "tû", "tûq", "bâq", "jâ", "hî", "nî", "hû"
+}
 type_1_conjunctions = {"róı", "rú", "rá", "ró", "rí", "kéo"}
 type_2_conjunctions = {"roı", "ru", "ra", "ro", "rı", "keo"}
 type_3_conjunctions = {"rôı", "rû", "râ", "rô", "rî", "kêo"}
@@ -45,22 +51,34 @@ raising_tone_illocutions = {"móq"}
 illocutions = (
   falling_tone_illocutions | raising_tone_illocutions
   | peaking_tone_illocutions)
-focus_markers = {"kú", "tóu", "béı"}
+focus_markers = {"kú", "béı", "tó", "máo", "júaq"}
+injective_focus_markers = {"kû", "bêı", "tô", "mâo", "jûaq"}
 clefts = {"bï", "nä", "gö"}
 vocative = {"hóı"}
 terminators = {"teo", "kı"}
 exophoric_pronouns = {
   "jí", "súq", "nháo", "súna", "nhána", "úmo", "íme", "súho", "áma", "há"
 }
-endophoric_pronouns = {"hóa", "hó", "máq", "tá", "hóq", "róu", "zé", "bóu", "áq", "chéq"}
+endophoric_pronouns = {
+  "hóa", "hó", "máq", "tá", "hóq", "róu", "zé", "bóu", "áq", "chéq"
+}
 pronouns = exophoric_pronouns | endophoric_pronouns
+injective_pronouns = {
+   "jî", "sûq", "nhâo", "sûna", "nhâna", "ûmo", "îme", "sûho", "âma", "hâ"
+   "hôa", "hô", "mâq", "tâ", "hôq", "rôu", "zê", "bôu", "âq", "chêq"
+}
+
+injectives = (
+  injective_pronouns | injective_subordinators | injective_determiners
+  | injective_focus_markers
+)
 
 functors_with_grammatical_tone = predicatizers | {"mı", "shu", "mo"}
 
 functors_with_lexical_tone = (
   root_subordinators | nominal_subordinators | adnominal_subordinators
-  | determiners | conjunctions | illocutions | focus_markers
-  | clefts | vocative | terminators | {"kïo"})
+  | pronouns | determiners | conjunctions | illocutions | focus_markers
+  | clefts | vocative | terminators | {"kïo"} | injectives)
 
 functor_lemmas = (
   functors_with_grammatical_tone | functors_with_lexical_tone)
@@ -85,70 +103,6 @@ def _with_replaced_characters(str, src_chars, rep_chars):
     i += 1
   return str
 
-def diacriticless_normalized(s):
-  s = s.lower()
-  s = re.sub("[x’]", "'", s)
-  s = re.sub("(?<=^)'", "", s)
-  s = unicodedata.normalize("NFD", s)
-  #s = re.sub("[^0-9A-Za-zı\u0300-\u030f'_ ()«»,;.…!?]+", " ", s)
-  s = re.sub("[^0-9A-Za-zı'_ ()«»,;.…!?]+", "", s)
-  s = unicodedata.normalize("NFC", s)
-  s = re.sub("i", "ı", s)
-  s = re.sub("ȷ", "j", s)
-  return s.strip()
-  
-def lemma_of(s):
-  return diacriticless_normalized(s)
-
-def normalized(s):
-  # TODO: Test again on example sentences. Check if the ⟦re⟧ module works instead of ⟦regex⟧.
-  assert isinstance(s, str)
-  if s == "":
-    return s
-  # Normalizing nonstandard characters:
-  s = s.strip()
-  s = re.sub("[x’]", "'", s)
-  s = re.sub("i", "ı", s)
-  s = re.sub("ȷ", "j", s)
-  s = re.sub("(?<=^)'", "", s)
-  s = unicodedata.normalize("NFC", s)
-  if None == re.search(
-    "[\s'áéíóúäëïöüâêîôû]", s, re.IGNORECASE
-  ):
-    # The input is a lemma.
-    s = s[0] + s[1:].lower()
-    s = unicodedata.normalize("NFC", s)
-  else:
-    # The input is a normal Toaq text or fragment (not a lemma form).
-    s = re.sub("[\t ]+", " ", s)
-    # Currently incorrect capitalization is not corrected.
-    chs = charset + charset.upper()
-    p = ( f"([^{chs}]*)([{chs}]*)" )
-    PU1 = "\u0091"
-    s = re.sub(p, f"\\1{PU1}\\2{PU1}", s)
-    l = re.split(PU1, s)
-    def f(w):
-      p = "^(?:[" + std_initial_str + "]h?)?([" + std_vowel_str + "])"
-      r = re.findall(p, w, re.IGNORECASE)
-      if r != []:
-        main_vowel_pos = w.index(r[0])
-        bare = _with_replaced_characters(
-          w,
-          "áéíóúäëïöüâêîôû",
-          "aeıouaeıouaeıou")
-        if bare.lower() in toneless_particles:
-          return bare
-        else: # bare in functors_with_grammatical_tone:
-          v = w[main_vowel_pos]
-          w = bare[:main_vowel_pos] + v + bare[main_vowel_pos + 1:]
-      return w
-    i = 1
-    while i < len(l):
-      l[i] = f(l[i])
-      i += 2
-    s = "".join(l)
-  return s
-
 def inflected_from_lemma(lemma, tone):
   assert is_a_lemma(lemma)
   assert not lemma in functors_with_lexical_tone | interjections
@@ -158,16 +112,19 @@ def inflected_from_lemma(lemma, tone):
   return lemma
 
 def inflected_vowel(vowel, tone):
-  assert vowel in "aeıou"
-  if tone in {"´", "́"}:
-    targets = "áéíóú"
+  if vowel not in "aeıouAEIOU":
+    raise ValueError(f"⟦inflected_vowel⟧: Invalid vowel: ⟪{vowel}⟫")
+  if tone == "":
+    return vowel
+  elif tone in {"´", "́"}:
+    targets = "áéíóúÁÉÍÓÚ"
   elif tone in {"^", "̂"}:
-    targets = "âêîôû"
+    targets = "âêîôûÂÊÎÔÛ"
   elif tone in {"¨", "̈"}:
-    targets = "äëïöü"
+    targets = "äëïöüÄËÏÔÛ"
   else:
-    raise Exception(f"Invalid tone: ⟪{tone}⟫")
-  return _with_replaced_characters(vowel, "aeıou", targets)
+    raise Exception(f"⟦inflected_vowel⟧: Invalid tone: ⟪{tone}⟫")
+  return _with_replaced_characters(vowel, "aeıouAEIOU", targets)
 
 def _first(iterable, has_property):
     i = next(
@@ -208,6 +165,164 @@ def is_a_lemma(s):
 def __is_an_interjection(s):
   return None != re.match(
       u"[áéíóúäëïöüâêîôû][aeiıou]*$", s)
+
+# ==================================================================== #
+
+def diacriticless_normalized(s):
+  s = s.lower()
+  s = re.sub("[x’]", "'", s)
+  s = re.sub("(?<=^)'", "", s)
+  s = unicodedata.normalize("NFD", s)
+  #s = re.sub("[^0-9A-Za-zı\u0300-\u030f'_ ()«»,;.…!?]+", " ", s)
+  s = re.sub("[^0-9A-Za-zı'_ ()«»,;.…!?]+", "", s)
+  s = unicodedata.normalize("NFC", s)
+  s = re.sub("i", "ı", s)
+  s = re.sub("ȷ", "j", s)
+  return s.strip()
+  
+def lemma_of(s):
+  return diacriticless_normalized(s)
+
+CUD = "̣" # Combining Underdot
+PU1 = "\u0091"
+PU2 = "\u0092"
+
+def normalized(s, without_stripping = False):
+  # TODO: Test again on example sentences. Check if the ⟦re⟧ module works instead of ⟦regex⟧.
+  # TODO: Handle function words bearing prefixes.
+  assert isinstance(s, str)
+  if s == "":
+    return s
+  # Normalizing nonstandard characters:
+  if not without_stripping:
+    s = s.strip()
+  s = _with_replaced_characters(s, "iȷwvxʼ", "ıjꝡꝡ''")
+  s = _with_replaced_characters(s, "İWV", "'IꝠꝠ")
+  s = re.sub("(?<=^)'", "", s)
+  T = "́̈̂" # Tone marks (◌́, ◌̂, ◌̂)
+  s = unicodedata.normalize("NFD", s)
+  s = re.sub(f"([{CUD}])([{T}])", r"\2\1", s)
+  s = s.replace(CUD, PU2)
+  s = unicodedata.normalize("NFC", s)
+  s = s.replace(PU2, CUD)
+  if None == re.search(
+    "[\s'áéíóúäëïöüâêîôû]", s, re.IGNORECASE
+  ) or s in functors_with_grammatical_tone:
+    # The input is a lemma.
+    s = s[0] + s[1:].lower()
+    s = unicodedata.normalize("NFC", s)
+  else:
+    # The input is a normal Toaq text or fragment (not a lemma form).
+    s = re.sub("[\t ]+", " ", s)
+    # Currently incorrect capitalization is not corrected.
+    chs = charset + charset.upper()
+    p = ( f"([^{chs}]*)([{chs}]*)" )
+    s = re.sub(p, f"\\1{PU1}\\2{PU1}", s)
+    l = re.split(PU1, s)
+    def f(w):
+      p = "^(?:[" + std_initial_str + "]h?)?([" + std_vowel_str + "])"
+      r = re.findall(p, w, re.IGNORECASE)
+      if r != []:
+        lower_w = w.lower().replace("i", "ı")
+        bare = _with_replaced_characters(
+          lower_w,
+          "áéíóúäëïöüâêîôû",
+          "aeıouaeıouaeıou")
+        main_vowel_pos = w.index(r[0])
+        main_vowel = lower_w[main_vowel_pos]
+        def bare_with_vowel(vowel):
+          return bare[:main_vowel_pos] + vowel + bare[main_vowel_pos + 1:]
+        if (
+          lower_w not in (functors_with_lexical_tone | injectives) and
+          bare.lower() in toneless_particles
+        ):
+          return bare
+        elif (
+          lower_w not in functors_with_lexical_tone and (
+          set() != functors_with_lexical_tone.intersection(
+            {bare_with_vowel(inflected_vowel(bare[main_vowel_pos], tone))
+             for tone in {"", "´", "^"}}
+          )
+        )):
+          raise ValueError(f"Function word ⟪{w}⟫ bears a disallowed tone!")
+        else:
+          lower_w = bare_with_vowel(main_vowel)
+          if w[0].isupper():
+            w = lower_w[0].upper() + lower_w[1:]
+          else:
+            w = lower_w
+      return w
+    i = 1
+    while i < len(l):
+      l[i] = f(l[i])
+      i += 2
+    s = "".join(l)
+  s = re.sub(
+    f"([aeıouAEIOU][{CUD}])",
+    lambda m: unicodedata.normalize("NFC", m.group(1)),
+    s)
+  return s
+
+def index_of_matching_bracket(s, i, openers, closers):
+  if i < 0 or i >= len(s):
+    raise(ValueError(f"Index {i} not in range ⟨0, {len(s)}⟩ in ⟪{str(s)}⟫"))
+  if s[i] in openers:
+    step = 1
+  elif s[i] in closers:
+    step = -1
+  else:
+    return None
+  c = 0
+  l = len(s)
+  while i in range(0, l):
+    if s[i] in openers:
+      c += 1
+    elif s[i] in closers:
+      c -= 1
+    if c == 0:
+      return i
+    i += step
+  return None
+
+SSA = "\u0086"  # control character: Start Selected Area
+ESA = "\u0087"  # control character: End Selected Area
+
+def with_quotes_selected(text):
+  text = re.sub(f"((?:M| m)[oóô])(?![{charset}])", r"\1" + SSA, text)
+  return re.sub(f" (teo)(?![{charset}])", " " + ESA + r"\1", text)
+
+def nonquote_quote_alternation(text):
+  seq = re.split(f"((?:M| m)[oóô])|( teo)(?![{charset}])", text)
+  i = 0
+  l = len(seq)
+  while i < l:
+    seq[i] = "" if seq[i] is None else seq[i]
+    i += 3
+  return [x for x in seq if x is not None]
+
+def toplevel_nonquote_quote_alternation(s):
+  s = with_quotes_selected(s)
+  l = []
+  i = 0
+  j = 0
+  while i < len(s):
+    if s[i] == SSA:
+      k = index_of_matching_bracket(s, i, SSA, ESA)
+      if k is None:
+        k = len(s)
+      l += [s[j : i], s[i + 1 : k]]
+      s = s[k + 1 :]
+      i = -1
+    i += 1
+  l += [s]
+  return [x.replace(SSA, "").replace(ESA, "") for x in l]
+
+def normalized_with_quotes_excluded(s):
+  l = toplevel_nonquote_quote_alternation(s)
+  for i, e in enumerate(l):
+    if i % 2 == 0:
+      l[i] = normalized(l[i], without_stripping = True)
+  return "".join(l)
 
 # ==================================================================== #
 
