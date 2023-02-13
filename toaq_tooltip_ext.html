@@ -48,7 +48,7 @@
       return toa.normalize('NFD')
                 .toLowerCase()
                 .replace(/i/g, 'ı')
-                .replace(/[\u0300-\u030f]/g, '')
+                .replace(/[\u0300-\u030f\u0323]/g, '')
                 .replace(/[^0-9A-ZꝠa-zıꝡ'\u0323_\-]+/g, ' ')
                 .replace(/ +/g, ' ')
                 .trim();
@@ -67,10 +67,33 @@
       return ""; // Definition not found.
     }
     
+    function with_combining_underdots(s) {
+      return s.replace(/[ạẹịọụ]/ig, (m) => m.normalize('NFD'));
+    }
+    
+    function  with_hyphenated_prefixes(s) {
+      s = s.replace(/\u0323/g, "\u0323");
+      s = s.replace(/m(['bcdefghjklmnprstvwxyzꝡ])/ig, "m-$1");
+      s = s.replace(
+        /(?<=\b)((?:['bcdefghjklmnprstvwxyzꝡ]h?[aeıiouáéíóúâêîôû\u0323]+q?[\-]?)*)(?=\u0091)/ig,
+        (m) => m.replace(
+          /([bcdefghjklmnpqrstvwxyzꝡ]?h?[aeıiouáéíóúâêîôû\u0323]+[mq]?)(?=['bcdefghjklmnprstvwxyzꝡ\u0091])/ig, "$1-"
+        )
+      );
+      s = s.replace(/(?![\-])\u0091/g, "-\u0091");
+      return s
+    }
+    
     function tooltip_html_from_toaq_text(dictionary, text) {
       /*** AUTOMATIC WORD DEFINITION TOOLTIPS FOR TOAQ TEXTS ***/
+      text = text.replace(/-(?=[aeiıou])/ig, "-'");
+      text = text.replace(/(?<![aeıiouáéíóúâêîôû])([aeıiouáéíóúâêîôû])([aeıiouáéíóúâêîôû]*-)(['bcdefghjklmnprstvwxyzꝡaeiıou]+)(?![\-])/ig, "$1\u0323$2\u0091$3");
+      text = with_combining_underdots(text);
+      text = text.replace(/([aeoáéóâêô]\u0323[iıou]?)(?![\-])/ig, "$1\u0091");
+      text = with_hyphenated_prefixes(text);
+      text = text.replace(/-(?!\u0091)/g, "-\u0091");
       // `dictionary` is the content of the loaded dictionary JSON.
-      var hoetoalai = "'’a-zA-Zıāēīōūȳáéíóúýäëïöüÿǎěǐǒǔảẻỉỏủỷâêîôûŷàèìòùỳãẽĩõũỹꝡ"
+      var hoetoalai = "\\-'’a-zA-Zıāēīōūȳáéíóúýäëïöüÿǎěǐǒǔảẻỉỏủỷâêîôûŷàèìòùỳãẽĩõũỹꝡ"
                   + "ĀĒĪŌŪȲÁÉÍÓÚÝÄËÏÖÜŸǍĚǏǑǓẢẺỈỎỦỶÂÊÎÔÛŶÀÈÌÒÙỲÃẼĨÕŨỸꝠ"
                   + "ạẹịọụẠẸỊỌỤ" + "\u0300-\u030f\u0323";
       if (is_undefined(tooltip_html_from_toaq_text.content_re)) {
@@ -89,14 +112,21 @@
         return;
       content.forEach(function (item, index, array) {
         // For each item in `content`, we check whether it's a Toaq word:
-        if (tooltip_html_from_toaq_text.toaq_re.test(item)) {
+        if (item != "" && tooltip_html_from_toaq_text.toaq_re.test(item)) {
           /* It is a Toaq word, so we get a normalized form of it
             (removing diacritics and having dotless i's: */
           var normalized_word = normalized(item);
+          if (normalized_word[0] == "'")
+            normalized_word = normalized_word.slice(1);
           // Now we look up the dictionary for the word:
           dictionary.every(function (entry, i, arr) {
             function f(toaq, is_official) {
-              if (normalized(toaq) == normalized_word) {
+              normalized_toaq = normalized(toaq);
+              if (normalized_toaq == normalized_word || (
+                '-' == normalized_word[normalized_word.length - 1]
+                && normalized_toaq == normalized_word.slice(
+                  0, normalized_word.length - 1)
+              )) {
                 // We have found the word in the dictionary.
                 // Now we fetch its definition and check if it isn't empty.
                 var def = get_definition(entry, "eng");
@@ -107,7 +137,7 @@
                   var tiptext = is_official ?
                     "tiptext" : "tiptext-unofficial tiptext";
                   array[index] = '<div class="' + tip + '">'
-                     + item + '<span class="' + tiptext + '">'
+                     + item.replace(/-/g, "") + '<span class="' + tiptext + '">'
                      + toaq + ' : ' + def + '</span></div>';
                 }
                 return true;
@@ -134,7 +164,7 @@
           });
         }
       });
-      return content.join("");
+      return content.join("").replace("\u0091", "");
     }
     
     $.getJSON(
