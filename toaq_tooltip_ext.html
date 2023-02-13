@@ -164,7 +164,7 @@
           });
         }
       });
-      return content.join("").replace("\u0091", "");
+      return content.join("").replace(/\u0091/g, "");
     }
     
     $.getJSON(
