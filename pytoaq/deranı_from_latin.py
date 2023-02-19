@@ -74,7 +74,7 @@ def deranı_from_latin(lt, opts = {}):
      r"\1 󱛔\3\4\5"),
     # ↑ Adding ⟪󱛔⟫ in places where commas are not used in the Latin script.
     (f" (da)(?![{L}{T}])", r" \1 󱛕"),
-    (f"(?<=[{L}{T}])(?<!mo)(?<!m[{T}]o)([󱛓󱛙]*)([^{L}{T}󱛒]*)(({MS})(?![{L}{T}])|$)",
+    (f"(?<=[{L}{T}])(?<!mo)(?<!m[{T}]o)(?<!shu)(?<!sh[{T}]u)([󱛓󱛙]*)([^{L}{T}󱛒]+)(({MS})(?![{L}{T}])|$)",
      r"\1 󱛕\2\3"),
     ("󱛕 󱛕", "󱛕"),
     # ↑ Adding assertive sentence end marks.
