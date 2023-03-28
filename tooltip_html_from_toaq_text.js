@@ -62,11 +62,11 @@ function with_combining_underdots(s) {
 
 function  with_hyphenated_prefixes(s) {
   s = s.replace(/\u0323/g, "\u0323");
-  s = s.replace(/m(['bcdefghjklmnprstvwxyzꝡ])/ig, "m-$1");
+  s = s.replace(/m(['bcdfghjklmnprstvwxyzꝡ])/ig, "m-$1");
   s = s.replace(
-    /(?<=\b)((?:['bcdefghjklmnprstvwxyzꝡ]h?[aeıiouáéíóúâêîôû\u0323]+q?[\-]?)*)(?=\u0091)/ig,
+    /(?<=\b)((?:['bcdfghjklmnprstvwxyzꝡ]h?[aeıiouáéíóúâêîôû\u0323]+q?[\-]?)*)(?=\u0091)/ig,
     (m) => m.replace(
-      /([bcdefghjklmnpqrstvwxyzꝡ]?h?[aeıiouáéíóúâêîôû\u0323]+[mq]?)(?=['bcdefghjklmnprstvwxyzꝡ\u0091])/ig, "$1-"
+      /([bcdfghjklmnpqrstvwxyzꝡ]?h?[aeıiouáéíóúâêîôû\u0323]+[mq]?)(?=['bcdfghjklmnprstvwxyzꝡ\u0091])/ig, "$1-"
     )
   );
   s = s.replace(/(?![\-])\u0091/g, "-\u0091");
@@ -76,7 +76,7 @@ function  with_hyphenated_prefixes(s) {
 function tooltip_html_from_toaq_text(dictionary, text) {
   /*** AUTOMATIC WORD DEFINITION TOOLTIPS FOR TOAQ TEXTS ***/
   text = text.replace(/-(?=[aeiıou])/ig, "-'");
-  text = text.replace(/(?<![aeıiouáéíóúâêîôû])([aeıiouáéíóúâêîôû])([aeıiouáéíóúâêîôû]*-)(['bcdefghjklmnprstvwxyzꝡaeiıou]+)(?![\-])/ig, "$1\u0323$2\u0091$3");
+  text = text.replace(/(?<![aeıiouáéíóúâêîôû])([aeıiouáéíóúâêîôû])([aeıiouáéíóúâêîôû]*-)(['bcdfghjklmnprstvwxyzꝡaeiıou]+)(?![\-])/ig, "$1\u0323$2\u0091$3");
   text = with_combining_underdots(text);
   text = text.replace(/([aeoáéóâêô]\u0323[iıou]?)(?![\-])/ig, "$1\u0091");
   text = with_hyphenated_prefixes(text);
