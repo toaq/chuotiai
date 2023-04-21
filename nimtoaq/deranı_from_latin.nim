@@ -70,7 +70,7 @@ proc deranı_from_latin(
   const CAA = "́" # Combining Acute Accent
   const CUD = "̣" # Combining Underdot
   const CVD = C & "aeıou" & CUD # Consonant, Vowel, Dot
-  const D = "aı|ao|eı|oı" # Diphthong
+  const D = fmt"a[{T}]?o|[aeo][{T}]?ı" # Diphthong
   const DHM = "󱛍" # Deranı Hiatus mark
   const FTW = fmt"[{C}]?h?[{V}]{CUD}?(?![{T}])[{C & V & CUD}]*"
   # ↑ Falling Tone Word
@@ -108,13 +108,13 @@ proc deranı_from_latin(
     # ↑ The PU1 control tag will be prepended by this program to target onomastic predicates, before this rewrite rule is applied.
     (fmt"̣([́̂{CUD}]?[{V}]?[mq]?)([{C}])", "$1󱛒$2"),
     # ↑ Adding prefix-root delineators ⟪󱛒⟫.
-    (fmt"(?!({D}))([{V}])([{V}])", fmt"$2{DHM}$3"),
+    (fmt"(?!({D}))([{V}][{T}]?)([{V}])", fmt"$2{DHM}$3"),
     # ↑ Adding hiatus marks to non-diphthong vowel sequences.
     (fmt"(?<=[{L}{T}])(󱛓?󱛙?([\s]󱛚)?)([^,󱛚{L}{T}]+)(e|na|ꝡe|ꝡa)([{T}])(?![{L}])",
      "$1 󱛔$3$4$5"),
     # ↑ Adding ⟪󱛔⟫ in places where commas are not used in the Latin script.
     (fmt" (da)(?![{L}{T}])", " $1 󱛕"),
-    (fmt"(?<=[{L}{T}])(?<!mo)(?<!m[{T}]o)(?<!shu)(?<!sh[{T}]u)([󱛓󱛙]*)([^{L}{T}󱛒]+)(({MS})(?![{L}{T}])|$)",
+    (fmt"(?<=[{L}{T}])(?<!mo)(?<!m[{T}]o)(?<!shu)(?<!sh[{T}]u)([󱛓󱛙]*)([^{L}{T}󱛒󱛙]*)([^{L}{T}󱛒󱛙]({MS})(?![{L}{T}])|$)",
      "$1 󱛕$2$3"),
     ("󱛕 󱛕", "󱛕"),
     # ↑ Adding assertive sentence end marks.
