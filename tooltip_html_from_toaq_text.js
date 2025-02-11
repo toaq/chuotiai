@@ -60,25 +60,27 @@ function with_combining_underdots(s) {
   return s.replace(/[ạẹịọụ]/ig, (m) => m.normalize('NFD'));
 }
 
-function  with_hyphenated_prefixes(s) {
-  s = s.replace(/\u0323/g, "\u0323");
-  s = s.replace(/m(['bcdfghjklmnprstvwxyzꝡ])/ig, "m-$1");
+function with_hyphenated_prefixes(s) {
+  // ⟪\u0323⟫ ↦ Combining dot below
   s = s.replace(
-    /(?<=\b)((?:['bcdfghjklmnprstvwxyzꝡ]h?[aeıiouáéíóúâêîôû\u0323]+q?[\-]?)*)(?=\u0091)/ig,
+    /(?<=\b)((?:['bcdfghjklmnprstvwxyzꝡ]h?[aeıiouáéíóúâêîôû\u0323]+[mq]?[\-]?)*)(?=\u0091)/ig,
     (m) => m.replace(
-      /([bcdfghjklmnpqrstvwxyzꝡ]?h?[aeıiouáéíóúâêîôû\u0323]+[mq]?)(?=['bcdfghjklmnprstvwxyzꝡ\u0091])/ig, "$1-"
+      /([bcdfghjklmnpqrstvwxyzꝡ]?h?[aeıiouáéíóúâêîôû\u0323]+[mq]?)(?=['bcdfghjklmnprstvwxyzꝡ\u0091][^-])/ig, "$1-"
     )
   );
-  s = s.replace(/(?![\-])\u0091/g, "-\u0091");
+  s = s.replace(/-m(?=\u0091)/g, "m-");
+  s = s.replace(/(?<![\-])\u0091/g, "-\u0091");
   return s
 }
 
 function tooltip_html_from_toaq_text(dictionary, text) {
   /*** AUTOMATIC WORD DEFINITION TOOLTIPS FOR TOAQ TEXTS ***/
   text = text.replace(/-(?=[aeiıou])/ig, "-'");
-  text = text.replace(/(?<![aeıiouáéíóúâêîôû])([aeıiouáéíóúâêîôû])([aeıiouáéíóúâêîôû]*-)(['bcdfghjklmnprstvwxyzꝡaeiıou]+)(?![\-])/ig, "$1\u0323$2\u0091$3");
+  text = text.replace(/(?<![aeıiouáéíóúâêîôû])([aeıiouáéíóúâêîôû])([aeıiouáéíóúâêîôû]*[mq]?-)(['bcdfghjklmnprstvwxyzꝡaeiıou]+)(?![\-])/ig, "$1\u0323$2\u0091$3");
   text = with_combining_underdots(text);
-  text = text.replace(/([aeoáéóâêô]\u0323[iıou]?)(?![\-])/ig, "$1\u0091");
+  text = text.replace(/([aeıiouáéíóúâêîôû]\u0323([mq](?=['bcdfghjklmnprstvwxyzꝡ-])))/ig, "$1\u0091");
+  text = text.replace(/([aeıiouáéíóúâêîôû]\u0323[iıou]?)(?![\-])(?![mq]\u0091)/ig, "$1\u0091");
+  text = text.replace(/\u0091(?=-\u0091)/g, "");
   text = with_hyphenated_prefixes(text);
   text = text.replace(/-(?!\u0091)/g, "-\u0091");
   // `dictionary` is the content of the loaded dictionary JSON.
@@ -111,11 +113,7 @@ function tooltip_html_from_toaq_text(dictionary, text) {
       dictionary.every(function (entry, i, arr) {
         function f(toaq, is_official) {
           normalized_toaq = normalized(toaq);
-          if (normalized_toaq == normalized_word || (
-            '-' == normalized_word[normalized_word.length - 1]
-            && normalized_toaq == normalized_word.slice(
-              0, normalized_word.length - 1)
-          )) {
+          if (normalized_toaq == normalized_word) {
             // We have found the word in the dictionary.
             // Now we fetch its definition and check if it isn't empty.
             var def = get_definition(entry, "eng");
