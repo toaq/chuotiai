@@ -44,16 +44,12 @@ function normalized(toa) {
 }
 
 function get_definition(entry, language) {
-  if (language == "eng" && !is_undefined(entry.english)) {
-    return entry.english;
+  key = language + "_definition";
+  if (!is_undefined(entry[key])) {
+    return entry[key];
+  } else {
+    return ""; // Definition not found.
   }
-  if (!is_undefined(entry.translations)) {
-    for (const item of entry.translations) {
-      if (item.language === language)
-        return item.definition;
-    }
-  }
-  return ""; // Definition not found.
 }
 
 function with_combining_underdots(s) {
@@ -71,6 +67,19 @@ function with_hyphenated_prefixes(s) {
   s = s.replace(/-m(?=\u0091)/g, "m-");
   s = s.replace(/(?<![\-])\u0091/g, "-\u0091");
   return s
+}
+
+function html_from_entry(entry) {
+  // Now we fetch its definition and check if it isn't empty.
+  var def = get_definition(entry, "eng");
+  if (def) {
+    def = with_escaped_html(def);
+    var c = entry.is_official ?
+      '' : ' style="color: #f2cf8c"';
+    return (
+      '<span' + c + '>➤ ' + entry.lemma + '<sub>' + entry.discriminator
+      + '</sub>: ' + def + '</span><br />');
+  } else return "";
 }
 
 function tooltip_html_from_toaq_text(dictionary, text) {
@@ -102,6 +111,7 @@ function tooltip_html_from_toaq_text(dictionary, text) {
   if (content === null)
     return;
   content.forEach(function (item, index, array) {
+    tooltip_content = "";
     // For each item in `content`, we check whether it's a Toaq word:
     if (item != "" && tooltip_html_from_toaq_text.toaq_re.test(item)) {
       /* It is a Toaq word, so we get a normalized form of it
@@ -110,45 +120,29 @@ function tooltip_html_from_toaq_text(dictionary, text) {
       if (normalized_word[0] == "'")
         normalized_word = normalized_word.slice(1);
       // Now we look up the dictionary for the word:
+      shall_exit = false;
+      the_word_has_been_found = false;
       dictionary.every(function (entry, i, arr) {
-        function f(toaq, is_official) {
-          normalized_toaq = normalized(toaq);
-          if (normalized_toaq == normalized_word) {
-            // We have found the word in the dictionary.
-            // Now we fetch its definition and check if it isn't empty.
-            var def = get_definition(entry, "eng");
-            if (def) {
-              def = with_escaped_html(def);
-              // Now we create a tooltip containing its definition:
-              var tip = is_official ? "tip" : "tip-unofficial tip";
-              var tiptext = is_official ?
-                "tiptext" : "tiptext-unofficial tiptext";
-              array[index] = '<div class="' + tip + '">'
-                 + item.replace(/-/g, "") + '<span class="' + tiptext + '">'
-                 + toaq + ' : ' + def + '</span></div>';
-            }
-            return true;
-          } else return false
-        }
         console.assert(
-          'toaq_forms' in entry && is_array(entry.toaq_forms),
-          "ERROR: No valid `toaq_forms` field in the dictionary entries!");
-        the_word_has_been_found = false;
-        entry.toaq_forms.every(function (e, i, l) {
-          console.assert(
-            is_string(e.toaq) || is_array(e.toaq),
-             "ERROR: `e.toaq` is not a string or an array but a "
-             + Object.prototype.toString.call(e.toaq));
-          if (!is_string(e.toaq))
-            return false;
-          the_word_has_been_found = f(e.toaq, e.is_official);
-          return !the_word_has_been_found;
-        });
+          'lemma' in entry && is_string(entry.lemma),
+          "ERROR: No valid `lemma` field in the dictionary entry!");
+        if (normalized(entry.lemma) == normalized_word) {
+	       // We have found the word in the dictionary.
+          the_word_has_been_found = true;
+          tooltip_content += html_from_entry(entry);
+        } else if (the_word_has_been_found) {
+          shall_exit = true;
+        }
         /* If we don't find the word in the dictionary, no tooltip
            is created. Nothing will happen when hovering the word
            with the mouse pointer. */
-        return !the_word_has_been_found;
+        return !shall_exit;
       });
+      if (tooltip_content.length > 0) {
+        array[index] = '<div class="tip">'
+          + item.replace(/-/g, "") + '<span class="tiptext">'
+          + tooltip_content + '</span></div>';
+	   }
     }
   });
   return content.join("").replace(/\u0091/g, "");
